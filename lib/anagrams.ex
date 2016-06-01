@@ -66,14 +66,16 @@ defmodule Anagrams do
   defp anagrams_for(phrase, dict_entries) do
     usable_entries = usable_entries_for(dict_entries, phrase)
 
-    init_acc = %{dict: usable_entries, anagrams: []}
-    %{anagrams: answer} = Enum.reduce(usable_entries, init_acc, fn(entry, acc) ->
-      anagrams_without_entry = anagrams_for((phrase |> without(entry)), acc.dict)
-      anagrams_with_entry = Enum.map(anagrams_without_entry, &([entry | &1]))
-      %{dict: tl(acc.dict), anagrams: anagrams_with_entry ++ acc.anagrams}
+    init_acc = %{dict: usable_entries, pids: []}
+    %{pids: pids} = Enum.reduce(usable_entries, init_acc, fn(entry, acc) ->
+      pid = Task.async fn ->
+        anagrams_without_entry = anagrams_for((phrase |> without(entry)), acc.dict)
+        Enum.map(anagrams_without_entry, &([entry | &1]))
+      end
+      %{dict: tl(acc.dict), pids: [pid|acc.pids]}
     end)
 
-    answer
+    pids |> Enum.flat_map(&Task.await/1)
   end
 
   # Convert a list of alphagrams to a list of human-readable anagrams
