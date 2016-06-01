@@ -54,15 +54,15 @@ defmodule AnagramsTest do
   end
 
   test "sub_alphagram?" do
-    assert Anagrams.sub_alphagram?(["a"],           ["a", "b"])      == true
-    assert Anagrams.sub_alphagram?(["b"],           ["a", "b"])      == true
-    assert Anagrams.sub_alphagram?(["c"],           ["a", "b"])      == false
-    assert Anagrams.sub_alphagram?(["a", "b"],      ["a", "b"])      == true
-    assert Anagrams.sub_alphagram?(["a", "b"],      ["a", "g"])      == false
-    assert Anagrams.sub_alphagram?(["a", "a"],      ["a", "b"])      == false
-    assert Anagrams.sub_alphagram?(["a", "a"],      ["a", "a", "b"]) == true
-    assert Anagrams.sub_alphagram?([],              ["a", "b"])      == true
-    assert Anagrams.sub_alphagram?(["a", "b"],      [])              == false
+    assert Anagrams.sub_alphagram?(["a", "b"],      ["a"])      == true
+    assert Anagrams.sub_alphagram?(["a", "b"],      ["b"])      == true
+    assert Anagrams.sub_alphagram?(["a", "b"],      ["c"])      == false
+    assert Anagrams.sub_alphagram?(["a", "b"],      ["a", "b"]) == true
+    assert Anagrams.sub_alphagram?(["a", "g"],      ["a", "b"]) == false
+    assert Anagrams.sub_alphagram?(["a", "b"],      ["a", "a"]) == false
+    assert Anagrams.sub_alphagram?(["a", "a", "b"], ["a", "a"]) == true
+    assert Anagrams.sub_alphagram?(["a", "b"],      [])         == true
+    assert Anagrams.sub_alphagram?([],              ["a", "b"]) == false
   end
 
   test "without" do

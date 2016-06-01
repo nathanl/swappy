@@ -104,42 +104,14 @@ defmodule Anagrams do
   end
 
   def usable_entries_for(dict_entries, phrase) do
-    Enum.filter(dict_entries, &(sub_alphagram?(&1, phrase)))
+    Enum.filter(dict_entries, &(sub_alphagram?(phrase, &1)))
+  end
+
+  def sub_alphagram?(outer, inner) do
+    (without(outer, inner, []) |> elem(0)) == :ok
   end
 
   # *** This function relies on knowledge that alphagrams are sorted ***
-  #
-  # Nothing left to look for
-  def sub_alphagram?([] = _possible_sub, _alphagram) do
-    true
-  end
-  #
-  # Still looking for something, but have exhausted the possibilities
-  def sub_alphagram?([_h|_t], []) do
-    false
-  end
-  # 
-  # Still looking for something, and still have things to check
-  def sub_alphagram?([psh | pst] = possible_sub, [ah | at] = _alphagram) do
-    cond do
-      # We have found this character, so look for the next one we need
-      # Eg, looking for c and find c
-      psh == ah ->
-        sub_alphagram?(pst, at)
-
-        # We haven't found this character, but we still might
-        # Eg, looking for c and find b; may find c later
-      psh > ah ->
-        sub_alphagram?(possible_sub, at)
-
-        # We will never find this character, so fail
-        # Eg, looking for a and find b; a will not occur later
-      psh < ah ->
-        false
-    end
-
-  end
-
   def without(outer, inner) do
     case without(outer, inner, []) do
       {:ok, acc} ->
