@@ -104,10 +104,10 @@ defmodule Anagrams do
   end
 
   def usable_entries_for(dict_entries, phrase) do
-    Enum.filter(dict_entries, &(sub_alphagram?(phrase, &1)))
+    Enum.filter(dict_entries, &(contains?(phrase, &1)))
   end
 
-  def sub_alphagram?(outer, inner) do
+  def contains?(outer, inner) do
     (without(outer, inner, []) |> elem(0)) == :ok
   end
 
