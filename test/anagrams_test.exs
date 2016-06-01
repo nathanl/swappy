@@ -38,7 +38,7 @@ defmodule AnagramsTest do
     IO.puts "loaded the dictionary file"
     # results = Anagrams.for("racecars are rad", hr_dict)
     start = timey_time_time_time
-    results = Anagrams.for("racecars are rad me", hr_dict)
+    results = Anagrams.for("racecars are rad me lad", hr_dict)
     the_end = timey_time_time_time
     IO.puts "OH YEAH #{the_end - start}"
     # results = Anagrams.for("matthew wildeboer", hr_dict) # bogs down
