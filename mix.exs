@@ -7,7 +7,16 @@ defmodule Anagrams.Mixfile do
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     description: "An anagram generator",
      deps: deps]
+  end
+
+  def package do
+    [
+      maintainers: ["Nathan Long"],
+      licenses: ["MIT"],
+      links: %{"Github" => "https://github.com/nathanl/elixir-anagrams"}
+    ]
   end
 
   # Configuration for the OTP application
@@ -27,6 +36,8 @@ defmodule Anagrams.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:ex_doc, "~> 0.10", only: :dev},
+    ]
   end
 end
