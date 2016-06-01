@@ -66,19 +66,11 @@ defmodule Anagrams do
   defp anagrams_for(phrase, dict_entries) do
     usable_entries = usable_entries_for(dict_entries, phrase)
 
-    answers = Enum.reduce(usable_entries, %{dict: usable_entries, anagrams: []}, fn(entry, acc) ->
-      anagrams_without_entry = anagrams_for(
-      (phrase |> without(entry)), acc.dict
-      )
-
-      updated_anagrams = Enum.reduce(
-      anagrams_without_entry, acc[:anagrams], fn (anagram_without_entry, acc) ->
-        anagram_with_entry = [entry | anagram_without_entry]
-        [anagram_with_entry | acc]
-      end
-      )
-
-      %{dict: tl(acc.dict), anagrams: updated_anagrams}
+    init_acc = %{dict: usable_entries, anagrams: []}
+    answers = Enum.reduce(usable_entries, init_acc, fn(entry, acc) ->
+      anagrams_without_entry = anagrams_for((phrase |> without(entry)), acc.dict)
+      anagrams_with_entry = Enum.map(anagrams_without_entry, &([entry | &1]))
+      %{dict: tl(acc.dict), anagrams: anagrams_with_entry ++ acc.anagrams}
     end)
 
     answers[:anagrams]
