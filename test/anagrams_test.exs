@@ -22,7 +22,12 @@ defmodule AnagramsTest do
     assert result == ["apple apple car race", "apple apple racecar"]
   end
 
-  @tag skip: "perf test, big and slow, has big old output"
+  def timey_time_time_time do
+    {_, secs, micros} = :os.timestamp
+    secs*1000000 + micros
+  end
+
+  # @tag skip: "perf test, big and slow, has big old output"
   @tag timeout: 120000, big: true, slow: true
   test "a big ol realistic test" do
     # hr_dict = Anagrams.load_human_readable_dictionary("/usr/share/dict/words")
@@ -32,7 +37,10 @@ defmodule AnagramsTest do
 
     IO.puts "loaded the dictionary file"
     # results = Anagrams.for("racecars are rad", hr_dict)
-    results = Anagrams.for("racecars are rad me lad", hr_dict)
+    start = timey_time_time_time
+    results = Anagrams.for("racecars are rad me", hr_dict)
+    the_end = timey_time_time_time
+    IO.puts "OH YEAH #{the_end - start}"
     # results = Anagrams.for("matthew wildeboer", hr_dict) # bogs down
     IO.inspect results
     IO.inspect("result count: #{Enum.count(results)}")
