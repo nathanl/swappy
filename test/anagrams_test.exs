@@ -27,7 +27,7 @@ defmodule AnagramsTest do
     secs*1000000 + micros
   end
 
-  # @tag skip: "perf test, big and slow, has big old output"
+  @tag skip: "perf test, big and slow, outputs to stdout"
   @tag timeout: 120000, big: true, slow: true
   test "a big ol realistic test" do
     # hr_dict = Anagrams.load_human_readable_dictionary("/usr/share/dict/words")
