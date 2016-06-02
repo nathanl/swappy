@@ -22,32 +22,6 @@ defmodule AnagramsTest do
     assert result == ["apple apple car race", "apple apple racecar"]
   end
 
-  def timey_time_time_time do
-    {_, secs, micros} = :os.timestamp
-    secs*1000000 + micros
-  end
-
-  @tag skip: "perf test, big and slow, outputs to stdout"
-  @tag timeout: 120000, big: true, slow: true
-  test "a big ol realistic test" do
-    # hr_dict = Anagrams.load_human_readable_dictionary("/usr/share/dict/words")
-    # hr_dict = Anagrams.load_human_readable_dictionary("/tmp/words") # remove words < 3 chars long, except "a"
-    # use http://www-01.sil.org/linguistics/wordlists/english/wordlist/wordsEn.txt
-    hr_dict = Anagrams.load_human_readable_dictionary("/Users/nathanl/code/wordular/tmp/sil_wordlist.txt")
-
-    IO.puts "loaded the dictionary file"
-    # results = Anagrams.for("racecars are rad", hr_dict)
-    start = timey_time_time_time
-    results = Anagrams.for("racecars are rad me lad", hr_dict)
-    the_end = timey_time_time_time
-    IO.puts "OH YEAH #{the_end - start}"
-    # results = Anagrams.for("matthew wildeboer", hr_dict) # bogs down
-    IO.inspect results
-    IO.inspect("result count: #{Enum.count(results)}")
-    File.write!("tmp/results.txt", results) # TODO make it put one anagram per line
-    # IO.inspect(Enum.max_by(results, fn(str) -> String.codepoints(str) |> Enum.filter(&(&1 == " ")) |> Enum.count end))
-  end
-
   test "can convert a string to sorted codepoints" do
     assert Anagrams.alphagram("nappy") == ["a", "n", "p", "p", "y"]
   end

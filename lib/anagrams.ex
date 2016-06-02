@@ -1,5 +1,21 @@
 defmodule Anagrams do
-  @legal_codepoints 97..122 # lowercase a..z
+  @dictionaries (for {k, v} <- Application.get_env(:anagrams, :dictionary_files, %{}), into: %{} do
+    {k, Anagrams.Dictionary.load_human_readable_dictionary(v)}
+  end)
+  @legal_codepoints Application.get_env(:anagrams, :legal_codepoints)
+
+  def for(phrase) do
+    __MODULE__.for(phrase, :default)
+  end
+
+  def for(phrase, dictionary_name) when is_atom(dictionary_name) do
+    case Map.fetch(@dictionaries, dictionary_name) do
+      :error ->
+      raise "Cannot find dictionary named #{inspect dictionary_name} in :dictionary_files environment variable - see README and config.exs"
+      {:ok, dictionary} ->
+        __MODULE__.for(phrase, dictionary)
+    end
+  end
 
   # Top level function
   # phrase is a string
@@ -11,20 +27,6 @@ defmodule Anagrams do
     anagrams |> Enum.map(&human_readable(&1, dict)) |> List.flatten
   end
 
-  # Takes a filename, returns list with one string per non-empty line
-  def load_human_readable_dictionary(filename) do
-    File.stream!(filename)
-    |> Enum.map(&String.strip/1)
-    # Throw out a bunch of tiny garbage "words" which vastly increase the
-    # number of anagrams if included
-    |> Enum.filter(fn (word) ->
-      cond do
-        String.length(word) < 2 && !word in ~w(a i o) -> false
-        String.length(word) == 2 && (!word in ~w(ad ah ai am an as at aw ax ay be bi by do eh er ex go ha he hi ho id if in is it la lo ma me my of oh on or ow ox oy pa pH pi qi re so to um up us we ye yo)) -> false
-        true -> true
-      end
-    end)
-  end
 
   # Sorted, non-unique list of codepoints
   # "alpha" -> ["a", "a", "h", "l", "p"]
