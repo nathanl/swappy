@@ -48,11 +48,15 @@ defmodule Anagrams do
   end
 
   # define base case
-  defp anagrams_for([], _dict_entries) do
+  defp anagrams_for(a, b) do
+    anagrams_for(a, b, true)
+  end
+
+  defp anagrams_for([], _dict_entries, _) do
     [[]]
   end
 
-  defp anagrams_for(_phrase, []) do
+  defp anagrams_for(_phrase, [], _) do
     [[]]
   end
 
@@ -63,19 +67,29 @@ defmodule Anagrams do
   # each answer contains exactly the letters of the input phrase
   # dict_entries is an enumerable.
   # returns a Set.
-  defp anagrams_for(phrase, dict_entries) do
+  defp anagrams_for(phrase, dict_entries, top_level) do
     usable_entries = usable_entries_for(dict_entries, phrase)
 
     init_acc = %{dict: usable_entries, pids: []}
     %{pids: pids} = Enum.reduce(usable_entries, init_acc, fn(entry, acc) ->
-      pid = Task.async fn ->
-        anagrams_without_entry = anagrams_for((phrase |> without(entry)), acc.dict)
+      the_fun = fn ->
+        anagrams_without_entry = anagrams_for((phrase |> without(entry)), acc.dict, false)
         Enum.map(anagrams_without_entry, &([entry | &1]))
       end
-      %{dict: tl(acc.dict), pids: [pid|acc.pids]}
+      if top_level do
+        pid = Task.async the_fun
+        %{dict: tl(acc.dict), pids: [pid|acc.pids]}
+      else
+        result = the_fun.()
+        %{dict: tl(acc.dict), pids: result ++ acc.pids}
+      end
     end)
 
-    pids |> Enum.flat_map(&Task.await/1)
+    if top_level do
+      pids |> Enum.flat_map(&Task.await/1)
+    else
+      pids
+    end
   end
 
   # Convert a list of alphagrams to a list of human-readable anagrams
