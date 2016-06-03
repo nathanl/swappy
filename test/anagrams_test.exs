@@ -36,26 +36,6 @@ defmodule AnagramsTest do
     assert actual == expected
   end
 
-  test "contains?" do
-    assert ConfiguredAnagrams.contains?(["a", "b"],      ["a"])      == true
-    assert ConfiguredAnagrams.contains?(["a", "b"],      ["b"])      == true
-    assert ConfiguredAnagrams.contains?(["a", "b"],      ["c"])      == false
-    assert ConfiguredAnagrams.contains?(["a", "b"],      ["a", "b"]) == true
-    assert ConfiguredAnagrams.contains?(["a", "g"],      ["a", "b"]) == false
-    assert ConfiguredAnagrams.contains?(["a", "b"],      ["a", "a"]) == false
-    assert ConfiguredAnagrams.contains?(["a", "a", "b"], ["a", "a"]) == true
-    assert ConfiguredAnagrams.contains?(["a", "b"],      [])         == true
-    assert ConfiguredAnagrams.contains?([],              ["a", "b"]) == false
-  end
-
-  test "without" do
-    assert ConfiguredAnagrams.without(["a"                ], [])         == ["a"]
-    assert ConfiguredAnagrams.without(["a"                ], ["a"])      == []
-    assert ConfiguredAnagrams.without(["a", "a"           ], ["a"])      == ["a"]
-    assert ConfiguredAnagrams.without(["a", "a"           ], ["a", "a"]) == []
-    assert ConfiguredAnagrams.without(["a", "b", "c", "d" ], ["b", "c"]) == ["a", "d"]
-  end
-
   test "human_readable builds a 'cartesian join' of words the alphagrams can spell" do
     anagram = [["a","c","e","r"], ["a","c","r"]]
     dictionary = %{
