@@ -7,8 +7,9 @@ defmodule Mix.Tasks.Performance do
     secs*1000000 + micros
   end
 
+  # NOTE: http://wordsmith.org/anagram/anagram.cgi?anagram=racecars+are+rad+me+lad&language=english&t=100&d=&include=&exclude=&n=&m=&source=adv&a=n&l=n&q=n&k=1 finds 78,948 anagrams for "racecars are rad me lad". We find 2,370,369 in a similar amount of time. :) I think the main factor is the dictionary.
   def run(_args) do
-    dict = Anagram.Dictionary.load_human_readable_dictionary("~/code/anagram_wordlists/pruned_wordlist_by_length.txt")
+    dict = Anagram.Dictionary.load_file("~/code/anagram_wordlists/pruned_wordlist_by_length.txt")
     IO.puts "loaded the dictionary file - size #{Enum.count(dict)}"
     start = timey_time_time_time
     results = ConfiguredAnagram.of("racecars are rad me lad", dict)
@@ -16,6 +17,7 @@ defmodule Mix.Tasks.Performance do
     IO.puts "anagram generation took #{the_end - start}"
     IO.puts "result count: #{Enum.count(results)}"
     IO.inspect results
-    File.write!("tmp/results.txt", results) # TODO make it put one anagram per line
+    output = results |> Enum.map(fn (result) -> [result, "\n"] end)
+    File.write!("tmp/results.txt", output)
   end
 end

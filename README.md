@@ -2,7 +2,16 @@
 
 Elixir anagram generator. Basic usage:
 
-    anagrams = Anagrams.for(some_string, some_dictionary)
+    defmodule MyAnagramGenerator do
+      @dictionaries Anagram.Dictionary.load_files(Application.get_env(:anagrams, :dictionary_files))
+      @legal_codepoints Application.get_env(:anagrams, :legal_codepoints)
+
+      use Anagram
+    end
+
+    anagrams = MyAnagramGenerator.for(some_string)
+    # or
+    anagrams = MyAnagramGenerator.for(some_string, some_dictionary)
 
 `some_dictionary` should be a list of words you consider valid.
 

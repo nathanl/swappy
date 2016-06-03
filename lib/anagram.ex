@@ -8,12 +8,19 @@ defmodule Anagram do
       end
 
       def of(phrase, dictionary_name) when is_atom(dictionary_name) do
-        case Map.fetch(@dictionaries, dictionary_name) do
+        if is_nil(dictionaries) do
+          raise "No dictionaries returned from function dictionaries/0"
+        end
+        case Map.fetch(dictionaries, dictionary_name) do
           :error ->
             raise "Cannot find dictionary named #{inspect dictionary_name} in :dictionary_files environment variable - see README and config.exs"
           {:ok, dictionary} ->
             of(phrase, dictionary)
         end
+      end
+
+      def dictionaries do
+        nil
       end
 
       # Top level function
@@ -26,6 +33,9 @@ defmodule Anagram do
         anagrams |> Enum.map(&human_readable(&1, dict)) |> List.flatten
       end
 
+      def legal_codepoints do
+        97..122 # lowercase a..z
+      end
 
       # Sorted, non-unique list of codepoints
       # "alpha" -> ["a", "a", "h", "l", "p"]
@@ -35,7 +45,7 @@ defmodule Anagram do
         |> String.codepoints
         |> Enum.reject(fn(codepoint) ->
           <<codepoint_val::utf8>> = codepoint
-          !(codepoint_val in @legal_codepoints)
+          !(codepoint_val in legal_codepoints)
         end)
         |> Enum.sort
       end
@@ -116,6 +126,7 @@ defmodule Anagram do
         Enum.filter(dict_entries, &(Anagram.Alphagram.contains?(phrase, &1)))
       end
 
+      defoverridable [dictionaries: 0, legal_codepoints: 0]
     end
 
   end

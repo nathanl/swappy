@@ -23,6 +23,10 @@ defmodule AnagramTest do
     assert result == ["apple apple car race", "apple apple racecar"]
   end
 
+  @tag skip: "pending"
+  test "can find words with apostrophes, like don't" do
+  end
+
   test "can convert a string to sorted codepoints" do
     assert ConfiguredAnagram.alphagram("nappy") == ["a", "n", "p", "p", "y"]
   end
