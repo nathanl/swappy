@@ -1,4 +1,4 @@
-defmodule Anagrams.Mixfile do
+defmodule Anagram.Mixfile do
   use Mix.Project
 
   def project do

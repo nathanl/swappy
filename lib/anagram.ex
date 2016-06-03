@@ -1,4 +1,4 @@
-defmodule Anagrams do
+defmodule Anagram do
 
   defmacro __using__(_) do
     quote do
@@ -74,7 +74,7 @@ defmodule Anagrams do
         init_acc = %{dict: usable_entries, pids: []}
         %{pids: pids} = Enum.reduce(usable_entries, init_acc, fn(entry, acc) ->
           the_fun = fn ->
-            anagrams_without_entry = anagrams_for((phrase |> Anagrams.Alphagram.without(entry)), acc.dict, false)
+            anagrams_without_entry = anagrams_for((phrase |> Anagram.Alphagram.without(entry)), acc.dict, false)
             Enum.map(anagrams_without_entry, &([entry | &1]))
           end
           if top_level do
@@ -113,7 +113,7 @@ defmodule Anagrams do
       end
 
       def usable_entries_for(dict_entries, phrase) do
-        Enum.filter(dict_entries, &(Anagrams.Alphagram.contains?(phrase, &1)))
+        Enum.filter(dict_entries, &(Anagram.Alphagram.contains?(phrase, &1)))
       end
 
     end

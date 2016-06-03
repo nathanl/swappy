@@ -1,4 +1,4 @@
-defmodule Anagrams.Alphagram do
+defmodule Anagram.Alphagram do
 
   def contains?(outer, inner) do
     (without(outer, inner, []) |> elem(0)) == :ok
