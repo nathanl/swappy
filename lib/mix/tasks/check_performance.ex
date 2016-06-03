@@ -8,7 +8,7 @@ defmodule Mix.Tasks.Performance do
   end
 
   def run(_args) do
-    dict = Anagram.Dictionary.load_human_readable_dictionary("/Users/nathanl/code/wordular/tmp/sil_wordlist.txt")
+    dict = Anagram.Dictionary.load_human_readable_dictionary("~/code/anagram_wordlists/pruned_wordlist_by_length.txt")
     IO.puts "loaded the dictionary file - size #{Enum.count(dict)}"
     start = timey_time_time_time
     results = ConfiguredAnagram.of("racecars are rad me lad", dict)
