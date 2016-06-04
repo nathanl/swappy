@@ -10,6 +10,8 @@ defmodule Mix.Tasks.Performance do
   # NOTE: http://wordsmith.org/anagram/anagram.cgi?anagram=racecars+are+rad+me+lad&language=english&t=100&d=&include=&exclude=&n=&m=&source=adv&a=n&l=n&q=n&k=1 finds 78,948 anagrams for "racecars are rad me lad". We find 2,370,369 in a similar amount of time. :) I think the main factor is the dictionary.
   def run(_args) do
     dict = Anagram.Dictionary.load_file("~/code/anagram_wordlists/pruned_wordlist_by_length.txt")
+    # dict = Anagram.Dictionary.load_file("~/code/anagram/lib/common_words_dictionary.txt")
+
     IO.puts "loaded the dictionary file - size #{Enum.count(dict)}"
     start = timey_time_time_time
     results = ConfiguredAnagram.of("racecars are rad me lad", dict)
