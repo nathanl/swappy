@@ -28,7 +28,7 @@ defmodule Anagram do
       # human_readable_dictionary is a set of strings
       def of(phrase, human_readable_dictionary) do
         dict          = dictionary(human_readable_dictionary)
-        dict_entries  = Map.keys(dict)
+        dict_entries  = Map.keys(dict) # TODO - make this ordered like input dict
         anagrams = anagrams_for(alphagram(phrase), dict_entries)
         anagrams |> Enum.map(&human_readable(&1, dict)) |> List.flatten
       end
@@ -63,16 +63,11 @@ defmodule Anagram do
         end)
       end
 
-      # define base case
-      defp anagrams_for(a, b) do
-        anagrams_for(a, b, true)
-      end
-
-      defp anagrams_for([], _dict_entries, _) do
+      defp anagrams_for([], _dict_entries) do
         [[]]
       end
 
-      defp anagrams_for(_phrase, [], _) do
+      defp anagrams_for(_phrase, []) do
         [[]]
       end
 
@@ -83,29 +78,17 @@ defmodule Anagram do
       # each answer contains exactly the letters of the input phrase
       # dict_entries is an enumerable.
       # returns a Set.
-      defp anagrams_for(phrase, dict_entries, top_level) do
+      defp anagrams_for(phrase, dict_entries) do
         usable_entries = usable_entries_for(dict_entries, phrase)
 
         init_acc = %{dict: usable_entries, pids: []}
         %{pids: pids} = Enum.reduce(usable_entries, init_acc, fn(entry, acc) ->
-          the_fun = fn ->
-            anagrams_without_entry = anagrams_for((phrase |> Anagram.Alphagram.without(entry)), acc.dict, false)
-            Enum.map(anagrams_without_entry, &([entry | &1]))
-          end
-          if top_level do
-            pid = Task.async the_fun
-            %{dict: tl(acc.dict), pids: [pid|acc.pids]}
-          else
-            result = the_fun.()
-            %{dict: tl(acc.dict), pids: result ++ acc.pids}
-          end
+          anagrams_without_entry = anagrams_for((phrase |> Anagram.Alphagram.without(entry)), acc.dict)
+          result = Enum.map(anagrams_without_entry, &([entry | &1]))
+          %{dict: tl(acc.dict), pids: result ++ acc.pids}
         end)
 
-        if top_level do
-          pids |> Enum.flat_map(&Task.await/1)
-        else
-          pids
-        end
+        pids
       end
 
       # Convert a list of alphagrams to a list of human-readable anagrams
