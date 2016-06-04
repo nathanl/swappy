@@ -2,9 +2,9 @@ defmodule Anagram.Dictionary do
 
   # Transform a map of dictionary names and filenames into one of dictionary names and lists of words
   def load_files(map) do
-    (for {k, v} <- map, into: %{} do
+    for {k, v} <- map, into: %{} do
       {k, load_file(v)}
-    end)
+    end
   end
 
   # Takes a filename, returns list with one string per non-empty line
