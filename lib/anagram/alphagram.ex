@@ -8,9 +8,9 @@ defmodule Anagram.Alphagram do
   def without(outer, inner) do
     case without(outer, inner, []) do
       {:ok, acc} ->
-        acc |> :lists.reverse
+        {:ok, (acc |> :lists.reverse), inner}
       {:error, message} ->
-        {:error, message}
+        {:error, message, {outer, inner}}
     end
   end
 
@@ -25,12 +25,12 @@ defmodule Anagram.Alphagram do
   end
 
   def without([] = _outer, _inner, _acc) do
-    {:error, "some letters in inner are not in outer"}
+    {:error, "outer does not contain all letters of inner"}
   end
 
   # We've run past the point where we can find what we're looking for
   def without([outer_h | _outer_t], [inner_h | _inner_t], _acc) when outer_h  > inner_h do
-    {:error, "some letters in inner are not in outer"}
+    {:error, "outer does not contain all letters of inner"}
   end
 
   # heads match - this is a letter we want to remove

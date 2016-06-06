@@ -79,11 +79,12 @@ defmodule Anagram do
       # dict_entries is an enumerable.
       # returns a Set.
       defp anagrams_for(phrase, dict_entries) do
+        # TODO - pmap this crap
         usable_entries = usable_entries_for(dict_entries, phrase)
 
-        init_acc = %{dict: usable_entries, pids: []}
-        %{pids: pids} = Enum.reduce(usable_entries, init_acc, fn(entry, acc) ->
-          anagrams_without_entry = anagrams_for((phrase |> Anagram.Alphagram.without(entry)), acc.dict)
+        init_acc = %{dict: usable_entries |> Enum.map(&elem(&1, 1)), pids: []}
+        %{pids: pids} = Enum.reduce(usable_entries, init_acc, fn({phrase_without_entry, entry}, acc) ->
+          anagrams_without_entry = anagrams_for(phrase_without_entry, acc.dict)
           result = Enum.map(anagrams_without_entry, &([entry | &1]))
           %{dict: tl(acc.dict), pids: result ++ acc.pids}
         end)
@@ -111,7 +112,10 @@ defmodule Anagram do
       end
 
       def usable_entries_for(dict_entries, phrase) do
-        Enum.filter(dict_entries, &(Anagram.Alphagram.contains?(phrase, &1)))
+        dict_entries
+        |> Enum.map(&(Anagram.Alphagram.without(phrase, &1)))
+        |> Enum.filter(fn ({result, _, _}) -> result === :ok end)
+        |> Enum.map(fn ({:ok, phrase, word}) -> {phrase, word} end)
       end
 
       defoverridable [dictionaries: 0, legal_codepoints: 0]
