@@ -28,19 +28,6 @@ defmodule AnagramTest do
     assert result == ["cool mi", "cool I'm"]
   end
 
-  test "can convert a string to sorted codepoints" do
-    assert ConfiguredAnagram.alphagram("nappy") == ["a", "n", "p", "p", "y"]
-  end
-
-  test "can map dictionary words by character list" do
-    actual = ConfiguredAnagram.dictionary(["bat", "tab", "hat"])
-    expected = %{
-      ["a", "b", "t"] => ["tab", "bat"],
-      ["a", "h", "t"] => ["hat"],
-    }
-    assert actual == expected
-  end
-
   test "human_readable builds a 'cartesian join' of words the alphagrams can spell" do
     anagram = [["a","c","e","r"], ["a","c","r"]]
     dictionary = %{

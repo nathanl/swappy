@@ -1,4 +1,8 @@
 defmodule Anagram do
+  @default_dictionaries Anagram.Dictionary.load_files(%{default: "#{Path.dirname(__ENV__.file)}/common_words_dictionary.txt"})
+  def default_dictionaries do
+    @default_dictionaries
+  end
 
   defmacro __using__(_) do
     quote do
@@ -8,59 +12,26 @@ defmodule Anagram do
       end
 
       def of(phrase, dictionary_name) when is_atom(dictionary_name) do
-        if is_nil(dictionaries) do
-          raise "No dictionaries returned from function dictionaries/0"
+        if :erlang.is_map(dictionaries) do
+          case Map.fetch(dictionaries, dictionary_name) do
+            :error ->
+              raise "Cannot find dictionary named #{inspect dictionary_name} in map returned from `dictionaries`"
+            {:ok, dictionary} ->
+              of(phrase, dictionary)
+          end
+        else
+          raise "No map of dictionaries was returned from function dictionaries/0 - see documentation"
         end
-        case Map.fetch(dictionaries, dictionary_name) do
-          :error ->
-            raise "Cannot find dictionary named #{inspect dictionary_name} in :dictionary_files environment variable - see README and config.exs"
-          {:ok, dictionary} ->
-            of(phrase, dictionary)
-        end
-      end
-
-      def dictionaries do
-        nil
       end
 
       # Top level function
       # phrase is a string
-      # human_readable_dictionary is a set of strings
-      def of(phrase, human_readable_dictionary) do
-        dict          = dictionary(human_readable_dictionary)
+      # wordlist is a list of strings
+      def of(phrase, wordlist) do
+        dict          = Anagram.Dictionary.to_dictionary(wordlist, legal_codepoints)
         dict_entries  = Map.keys(dict) # TODO - make this ordered like input dict
-        anagrams = anagrams_for(alphagram(phrase), dict_entries)
+        anagrams = anagrams_for(Anagram.Alphagram.to_alphagram(phrase, legal_codepoints), dict_entries)
         anagrams |> Enum.map(&human_readable(&1, dict)) |> List.flatten
-      end
-
-      def legal_codepoints do
-        97..122 # lowercase a..z
-      end
-
-      # Sorted, non-unique list of codepoints
-      # "alpha" -> ["a", "a", "h", "l", "p"]
-      def alphagram(string) do
-        string
-        |> String.downcase
-        |> String.codepoints
-        |> Enum.reject(fn(codepoint) ->
-          <<codepoint_val::utf8>> = codepoint
-          !(codepoint_val in legal_codepoints)
-        end)
-        |> Enum.sort
-      end
-
-      # returns map with entries like ["d", "g", "o"] => ["god", "dog"]
-      def dictionary(human_readable_dictionary) do
-        Enum.reduce(human_readable_dictionary, %{}, fn word, map_acc ->
-          word = String.strip(word)
-          if word == "" do
-            map_acc
-          else
-            # If key isn't found, the value passed to our function is 'nil'
-            update_in(map_acc, [alphagram(word)], &([word|(&1 || [])]))
-          end
-        end)
       end
 
       defp anagrams_for([], _dict_entries) do
@@ -118,6 +89,14 @@ defmodule Anagram do
             _ -> acc
           end
         end)
+      end
+
+      def dictionaries do
+        Anagram.default_dictionaries
+      end
+
+      def legal_codepoints do
+        Anagram.Alphagram.legal_codepoints
       end
 
       defoverridable [dictionaries: 0, legal_codepoints: 0]
