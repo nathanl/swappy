@@ -113,9 +113,14 @@ defmodule Anagram do
 
       def usable_entries_for(dict_entries, phrase) do
         dict_entries
-        |> Enum.map(&(Anagram.Alphagram.without(phrase, &1)))
-        |> Enum.filter(fn ({result, _, _}) -> result === :ok end)
-        |> Enum.map(fn ({:ok, phrase, word}) -> {phrase, word} end)
+        |> Enum.reduce([], fn (entry, acc) ->
+          case Anagram.Alphagram.without(phrase, entry) do
+            {:ok, outer, inner} -> [ {outer, inner} | acc]
+            _ -> acc
+          end
+        end)
+        # TODO - this is only here because tests expect a certain order - fix that and delete it
+        |> :lists.reverse
       end
 
       defoverridable [dictionaries: 0, legal_codepoints: 0]
