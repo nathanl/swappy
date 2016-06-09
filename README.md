@@ -6,9 +6,9 @@ Elixir anagram generator. Basic usage:
       use Anagram
     end
 
-    anagrams = MyAnagramGenerator.for(some_string) # uses a default wordlist
+    anagrams = MyAnagramGenerator.anagrams_of(some_string) # uses a default wordlist
     # or
-    anagrams = MyAnagramGenerator.for(some_string, some_wordlist)
+    anagrams = MyAnagramGenerator.anagrams_of(some_string, some_wordlist)
 
 `some_wordlist` should be a list of words you consider valid.
 

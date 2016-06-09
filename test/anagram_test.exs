@@ -5,46 +5,46 @@ defmodule AnagramTest do
   doctest Anagram
 
   test "can find the only possible anagrams using a tiny dictionary" do
-    result = BasicAnagramUser.of("onto", ["on", "to"])
+    result = BasicAnagramUser.anagrams_of("onto", ["on", "to"])
     assert result == ["on to"]
   end
 
   test "ignores punctuation, capitalization and spaces" do
-    result = BasicAnagramUser.of("On, To!", ["on", "to"])
+    result = BasicAnagramUser.anagrams_of("On, To!", ["on", "to"])
     assert result == ["on to"]
   end
 
   test "can find human-readable anagrams of a phrase using a dictionary" do
-    result = BasicAnagramUser.of("racecar", ["arc", "are", "car", "care", "race"])
+    result = BasicAnagramUser.anagrams_of("racecar", ["arc", "are", "car", "care", "race"])
     assert result == ["race car", "race arc", "care car", "care arc"]
   end
 
   test "can handle duplicate words in the input phrase" do
-    result = BasicAnagramUser.of("apple racecar apple", ["race", "car", "apple", "racecar"])
+    result = BasicAnagramUser.anagrams_of("apple racecar apple", ["race", "car", "apple", "racecar"])
     assert result == ["apple racecar apple", "car apple race apple", ]
   end
 
   test "can find words with apostrophes, like 'I'm'" do
-    result = BasicAnagramUser.of("I'm cool", ["I'm", "cool", "mi"])
+    result = BasicAnagramUser.anagrams_of("I'm cool", ["I'm", "cool", "mi"])
     assert result == ["cool mi", "cool I'm"]
   end
 
   test "uses the built-in default dictionary if none is specified" do
-    assert BasicAnagramUser.of("onto") == BasicAnagramUser.of("onto", :default)
+    assert BasicAnagramUser.anagrams_of("onto") == BasicAnagramUser.anagrams_of("onto", :default)
   end
 
   test "can find anagrams using the built-in default dictionary" do
-    result = BasicAnagramUser.of("onto")
+    result = BasicAnagramUser.anagrams_of("onto")
     assert result == ["onto", "no to", "on to", "ton o", "not o"]
   end
 
   test "can find anagrams using a dictionary defined in the user's module" do
-    result = CustomAnagramUser.of("spear", :tiny)
+    result = CustomAnagramUser.anagrams_of("spear", :tiny)
     assert result == ["spear", "spare", "reaps", "pears", "parse", "pares"]
   end
 
   test "uses legal_codepoints as defined in the user's module" do
-    result = CustomAnagramUser.of("mañana", :tiny_spanish)
+    result = CustomAnagramUser.anagrams_of("mañana", :tiny_spanish)
     assert result == ["mañana", "ña mana", "maña na"]
   end
 
