@@ -79,17 +79,18 @@ defmodule Anagram do
       # dict_entries is an enumerable.
       # returns a Set.
       defp anagrams_for(phrase, dict_entries) do
-        # TODO - pmap this crap
         usable_entries = usable_entries_for(dict_entries, phrase)
 
-        init_acc = %{dict: usable_entries |> Enum.map(&elem(&1, 1)), pids: []}
-        %{pids: pids} = Enum.reduce(usable_entries, init_acc, fn({phrase_without_entry, entry}, acc) ->
+        init_acc = %{dict: usable_entries |> Enum.map(&elem(&1, 1)), results: []}
+        %{results: results} = Enum.reduce(usable_entries, init_acc, fn({phrase_without_entry, entry}, acc) ->
+          # find all anagrams for the phrase with "apple" removed
           anagrams_without_entry = anagrams_for(phrase_without_entry, acc.dict)
-          result = Enum.map(anagrams_without_entry, &([entry | &1]))
-          %{dict: tl(acc.dict), pids: result ++ acc.pids}
+          # for each of those results, stick apple back on
+          anagrams_with_entry = Enum.map(anagrams_without_entry, &([entry | &1]))
+          %{dict: tl(acc.dict), results: anagrams_with_entry ++ acc.results}
         end)
 
-        pids
+        results
       end
 
       # Convert a list of alphagrams to a list of human-readable anagrams
