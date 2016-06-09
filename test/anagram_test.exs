@@ -5,22 +5,22 @@ defmodule AnagramTest do
 
   test "can find the only possible anagrams using a tiny dictionary" do
     result = ConfiguredAnagram.of("onto", ["on", "to"])
-    assert result == ["to on"]
+    assert result == ["on to"]
   end
 
   test "ignores punctuation, capitalization and spaces" do
     result = ConfiguredAnagram.of("On, To!", ["on", "to"])
-    assert result == ["to on"]
+    assert result == ["on to"]
   end
 
   test "can find human-readable anagrams of a phrase using a dictionary" do
     result = ConfiguredAnagram.of("racecar", ["arc", "are", "car", "care", "race"])
-    assert result == ["arc care", "arc race", "car care", "car race"]
+    assert result == ["race car", "race arc", "care car", "care arc"]
   end
 
   test "can handle duplicate words in the input phrase" do
     result = ConfiguredAnagram.of("apple racecar apple", ["race", "car", "apple", "racecar"])
-    assert result == ["apple apple car race", "apple apple racecar"]
+    assert result == ["apple racecar apple", "car apple race apple", ]
   end
 
   @tag skip: "pending"

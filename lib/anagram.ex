@@ -79,11 +79,14 @@ defmodule Anagram do
 
         init_acc = %{dict: usable_entries |> Enum.map(&elem(&1, 1)), results: []}
         %{results: results} = Enum.reduce(usable_entries, init_acc, fn({phrase_without_entry, entry}, acc) ->
-          # eg, find all anagrams for the phrase with "apple" removed
           anagrams_without_entry = anagrams_for(phrase_without_entry, acc.dict)
-          # eg, for each of those results, stick apple back on
-          anagrams_with_entry = Enum.map(anagrams_without_entry, &([entry | &1]))
-          %{dict: tl(acc.dict), results: anagrams_with_entry ++ acc.results}
+
+          new_results = Enum.reduce(anagrams_without_entry, acc.results, fn (anagram_without_entry, results) ->
+            anagram_with_entry = [entry | anagram_without_entry]
+            [anagram_with_entry | results]
+          end)
+
+          %{dict: tl(acc.dict), results: new_results}
         end)
 
         results
@@ -97,7 +100,6 @@ defmodule Anagram do
         |> Enum.map(&(dictionary[&1]))
         |> cartesian_product
         |> Enum.map(&Enum.join(&1, " "))
-        |> Enum.sort
       end
 
       # cartesian_prod([0..2, 0..1, 0..2]) = [000, 001, 002, 010, 011, 012, 100...]
@@ -116,8 +118,6 @@ defmodule Anagram do
             _ -> acc
           end
         end)
-        # TODO - this is only here because tests expect a certain order - fix that and delete it
-        |> :lists.reverse
       end
 
       defoverridable [dictionaries: 0, legal_codepoints: 0]
