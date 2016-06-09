@@ -53,8 +53,13 @@ defmodule Anagram do
       # returns map with entries like ["d", "g", "o"] => ["god", "dog"]
       def dictionary(human_readable_dictionary) do
         Enum.reduce(human_readable_dictionary, %{}, fn word, map_acc ->
-          # If key isn't found, the value passed to our function is 'nil'
-          update_in(map_acc, [alphagram(word)], &([word|(&1 || [])]))
+          word = String.strip(word)
+          if word == "" do
+            map_acc
+          else
+            # If key isn't found, the value passed to our function is 'nil'
+            update_in(map_acc, [alphagram(word)], &([word|(&1 || [])]))
+          end
         end)
       end
 
