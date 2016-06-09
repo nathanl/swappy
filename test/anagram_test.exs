@@ -54,7 +54,7 @@ defmodule AnagramTest do
       ["a", "c", "e", "r"] => ["race", "care"],
       ["a", "c", "r"] => ["car"],
     }
-    assert((BasicAnagramUser.human_readable(anagram, dictionary) |> Enum.sort) == [
+    assert((Anagram.human_readable(anagram, dictionary) |> Enum.sort) == [
       "car care", "car race"
     ])
   end

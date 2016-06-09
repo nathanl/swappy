@@ -36,26 +36,7 @@ defmodule Anagram do
         dict          = Anagram.Dictionary.to_dictionary(wordlist, legal_codepoints)
         dict_entries  = Map.keys(dict) # TODO - make this ordered like input dict
         anagrams = Anagram.anagrams_for(Anagram.Alphagram.to_alphagram(phrase, legal_codepoints), dict_entries)
-        anagrams |> Enum.map(&human_readable(&1, dict)) |> List.flatten
-      end
-
-
-      # Convert a list of alphagrams to a list of human-readable anagrams
-      # e.g. [ alphagram("race"), alphagram("car") ] =>
-      # [ "care car", "race car" ]
-      def human_readable(anagram, dictionary) do
-        anagram
-        |> Enum.map(&(dictionary[&1]))
-        |> cartesian_product
-        |> Enum.map(&Enum.join(&1, " "))
-      end
-
-      # cartesian_prod([0..2, 0..1, 0..2]) = [000, 001, 002, 010, 011, 012, 100...]
-      def cartesian_product([]), do: []
-      def cartesian_product(lists) do
-        Enum.reduce(lists, [ [] ], fn one_list, acc ->
-          for item <- one_list, subproduct <- acc, do: [item | subproduct]
-        end)
+        anagrams |> Enum.map(&Anagram.human_readable(&1, dict)) |> List.flatten
       end
 
       def wordlists do
@@ -107,6 +88,24 @@ defmodule Anagram do
         {:ok, outer, inner} -> [ {outer, inner} | acc]
         _ -> acc
       end
+    end)
+  end
+
+  # Convert a list of alphagrams to a list of human-readable anagrams
+  # e.g. [ alphagram("race"), alphagram("car") ] =>
+  # [ "care car", "race car" ]
+  def human_readable(anagram, dictionary) do
+    anagram
+    |> Enum.map(&(dictionary[&1]))
+    |> cartesian_product
+    |> Enum.map(&Enum.join(&1, " "))
+  end
+
+  # cartesian_prod([0..2, 0..1, 0..2]) = [000, 001, 002, 010, 011, 012, 100...]
+  def cartesian_product([]), do: []
+  def cartesian_product(lists) do
+    Enum.reduce(lists, [ [] ], fn one_list, acc ->
+      for item <- one_list, subproduct <- acc, do: [item | subproduct]
     end)
   end
 
