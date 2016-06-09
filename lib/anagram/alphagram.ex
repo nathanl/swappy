@@ -1,9 +1,5 @@
 defmodule Anagram.Alphagram do
 
-  def contains?(outer, inner) do
-    (without(outer, inner, []) |> elem(0)) == :ok
-  end
-
   # *** This function relies on knowledge that alphagrams are sorted ***
   def without(outer, inner) do
     case without(outer, inner, []) do
