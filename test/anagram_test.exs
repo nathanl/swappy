@@ -23,8 +23,9 @@ defmodule AnagramTest do
     assert result == ["apple racecar apple", "car apple race apple", ]
   end
 
-  @tag skip: "pending"
-  test "can find words with apostrophes, like don't" do
+  test "can find words with apostrophes, like 'I'm'" do
+    result = ConfiguredAnagram.of("I'm cool", ["I'm", "cool", "mi"])
+    assert result == ["cool mi", "cool I'm"]
   end
 
   test "can convert a string to sorted codepoints" do
