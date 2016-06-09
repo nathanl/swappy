@@ -3,49 +3,51 @@
 Elixir anagram generator. Basic usage:
 
     defmodule MyAnagramGenerator do
-      @dictionaries Anagram.Dictionary.load_files(Application.get_env(:anagrams, :dictionary_files))
-      @legal_codepoints Application.get_env(:anagrams, :legal_codepoints)
-
       use Anagram
     end
 
-    anagrams = MyAnagramGenerator.for(some_string)
+    anagrams = MyAnagramGenerator.for(some_string) # uses a default wordlist
     # or
-    anagrams = MyAnagramGenerator.for(some_string, some_dictionary)
+    anagrams = MyAnagramGenerator.for(some_string, some_wordlist)
 
-`some_dictionary` should be a list of words you consider valid.
+`some_wordlist` should be a list of words you consider valid.
 
-If you configure one or more dictionaries in `config.exs`:
+## Custom Wordlists
 
-    config :anagrams,
-      dictionary_files: %{default: "/path/to/file.txt", alt_dict: "/other/file.txt"},
+If you want your module to use one or more custom word lists, define a `wordlists` method that returns a map. One of the map keys should be `:default`, and each value should be a list of words.
 
-... you can do this:
+Your wordlist has to undergo some processing before it can be used to build anagrams. If you're going to use large custom wordlist, you probably want to do that processing at compile time, not at runtime.
 
-    anagrams = Anagrams.for(some_string, :alt_dict)
-    anagrams = Anagrams.for(some_string) # assumes :default
+You can do that as follows:
 
-**Note: configuration and dictionary files are read at compile time, so if you change them, you must recompile to see the changes.**
-
-## About the Dictionary
-
-The dictionary you use has a huge effect on the number and quality of your anagrams, as well as the time it takes to generate them.
-
-A decent starting dictionary is: http://www-01.sil.org/linguistics/wordlists/english/
-
-However, you probably want to clean up whatever you use.
-
-Some dictionaries list things like 'r' as a word, on the grounds that you can say "The word 'rake' starts with 'r'." However, having every individual letter considered a "word" makes the number of possible anagrams astronomical.
-
-Personally, I throw out most one- and two-letter "words" from my dictionaries, along with anything containing apostrophes. You could do that like this:
-
-    words |> Enum.filter(fn (word) ->
-      cond do
-        String.length(word) < 2 && !word in ~w(a i o) -> false
-        String.length(word) == 2 && (!word in ~w(ad ah ai am an as at aw ax ay be bi by do eh er ex go ha he hi ho id if in is it la lo ma me my of oh on or ow ox oy pa pH pi qi re so to um up us we ye yo)) -> false
-        true -> true
+    defmodule AnagramUser do
+      use Anagram
+      @wordlists Anagram.Dictionary.load_files(
+        %{
+          default:   "/path/to/some_dictionary",
+          alternate: "~/path/to/other_dictionary"
+         }
+      )
+      def wordlists do
+        @wordlists
       end
-    end)
+  end
+
+## About the Wordlist
+
+The wordlist you use has a huge effect on the number and quality of your anagrams, as well as the time it takes to generate them.
+
+Some possible starting wordlists can be found at:
+
+ - http://www-01.sil.org/linguistics/wordlists/english/
+ - https://github.com/first20hours/google-10000-english
+ - http://norvig.com/ngrams/
+
+However, you probably want to clean up whatever you use. In particular, **every short word you supply vastly increases the number of anagrams generated**. You want as few 1-letter and 2-letter words as you can have.
+
+Some wordlists include things 'r' as a word, on the grounds that you can say "The word 'rake' starts with 'r'." However, having every individual letter considered a "word" makes the number of possible anagrams astronomical.
+
+See `Mix.Tasks.CleanUpEnglishDictionary` for an opinionated filter, then make your own if you wish.
 
 ## TODO
 

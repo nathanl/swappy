@@ -1,7 +1,7 @@
 defmodule Anagram do
-  @default_dictionaries Anagram.Dictionary.load_files(%{default: "#{Path.dirname(__ENV__.file)}/common_words_dictionary.txt"})
-  def default_dictionaries do
-    @default_dictionaries
+  @default_wordlists Anagram.Dictionary.load_files(%{default: "#{Path.dirname(__ENV__.file)}/common_words_dictionary.txt"})
+  def default_wordlists do
+    @default_wordlists
   end
 
   defmacro __using__(_) do
@@ -22,6 +22,11 @@ defmodule Anagram do
         else
           raise "No map of dictionaries was returned from function dictionaries/0 - see documentation"
         end
+      end
+
+      # TODO - find a way to process these with Anagram.Dictionary.to_dictionary at compile time
+      def dictionaries do
+        wordlists
       end
 
       # Top level function
@@ -91,15 +96,15 @@ defmodule Anagram do
         end)
       end
 
-      def dictionaries do
-        Anagram.default_dictionaries
+      def wordlists do
+        Anagram.default_wordlists
       end
 
       def legal_codepoints do
         Anagram.Alphagram.legal_codepoints
       end
 
-      defoverridable [dictionaries: 0, legal_codepoints: 0]
+      defoverridable [wordlists: 0, legal_codepoints: 0]
     end
 
   end
