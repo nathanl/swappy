@@ -67,10 +67,6 @@ defmodule Anagram do
         [[]]
       end
 
-      defp anagrams_for(_phrase, []) do
-        [[]]
-      end
-
       # catbat
       # set([["a", "b", "t"], ["a", "c", "t"]], ...)
       # phrase is a alphagram; dict_entries is a set of alphagrams
@@ -83,9 +79,9 @@ defmodule Anagram do
 
         init_acc = %{dict: usable_entries |> Enum.map(&elem(&1, 1)), results: []}
         %{results: results} = Enum.reduce(usable_entries, init_acc, fn({phrase_without_entry, entry}, acc) ->
-          # find all anagrams for the phrase with "apple" removed
+          # eg, find all anagrams for the phrase with "apple" removed
           anagrams_without_entry = anagrams_for(phrase_without_entry, acc.dict)
-          # for each of those results, stick apple back on
+          # eg, for each of those results, stick apple back on
           anagrams_with_entry = Enum.map(anagrams_without_entry, &([entry | &1]))
           %{dict: tl(acc.dict), results: anagrams_with_entry ++ acc.results}
         end)
