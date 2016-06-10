@@ -1,7 +1,7 @@
 defmodule Anagram.Alphagram do
 
   def legal_codepoints do
-    97..122 # lowercase a..z
+    (?a..?z)
   end
 
   # Convenience for to_alphagram/2; uses default list
