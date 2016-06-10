@@ -28,9 +28,9 @@ defmodule Anagram do
       # phrase is a string
       # wordlist is a list of strings
       def anagrams_of(phrase, wordlist) do
-        dict          = Anagram.Dictionary.to_dictionary(wordlist, legal_codepoints)
+        dict          = Anagram.Dictionary.to_dictionary(wordlist, &legal_codepoint?/1)
         dict_entries  = Map.keys(dict) # TODO - make this ordered like input dict
-        anagrams = Anagram.of(Anagram.Alphagram.to_alphagram(phrase, legal_codepoints), dict_entries)
+        anagrams = Anagram.of(Anagram.Alphagram.to_alphagram(phrase, &legal_codepoint?/1), dict_entries)
         anagrams |> Enum.map(&Anagram.human_readable(&1, dict)) |> List.flatten
       end
 
@@ -43,11 +43,11 @@ defmodule Anagram do
         Anagram.default_wordlists
       end
 
-      def legal_codepoints do
-        Anagram.Alphagram.legal_codepoints
+      def legal_codepoint?(codepoint) do
+        Anagram.Alphagram.legal_codepoint?(codepoint)
       end
 
-      defoverridable [wordlists: 0, legal_codepoints: 0]
+      defoverridable [wordlists: 0, legal_codepoint?: 1]
     end
 
   end

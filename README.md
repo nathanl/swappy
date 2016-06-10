@@ -49,6 +49,10 @@ Some wordlists include things 'r' as a word, on the grounds that you can say "Th
 
 See `Mix.Tasks.CleanUpEnglishDictionary` for an opinionated filter, then make your own if you wish.
 
+## `legal_codepoint?(codepoint)`
+
+TODO - explain
+
 ## TODO
 
 - http://stackoverflow.com/questions/37601658/how-can-i-get-my-library-code-to-recompile-if-the-application-environment-change

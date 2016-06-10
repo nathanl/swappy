@@ -1,9 +1,9 @@
 defmodule CustomAnagramUser do
   use Anagram
 
-  @legal_codepoints Enum.to_list(Anagram.Alphagram.legal_codepoints) ++ ["á", "é", "í", "ó", "ú", "ü", "ñ"]
-  def legal_codepoints do
-    @legal_codepoints
+  @legal_codepoints Enum.to_list(?a..?z) ++ ["á", "é", "í", "ó", "ú", "ü", "ñ"]
+  def is_legal_codepoint?(codepoint) do
+    codepoint in @legal_codepoints
   end
 
   @custom_wordlists %{

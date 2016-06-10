@@ -10,11 +10,18 @@ defmodule Anagram.AlphagramTest do
     # Assumes default legal codepoints
     assert Anagram.Alphagram.to_alphagram("nappy?!!") == ["a", "n", "p", "p", "y"]
 
-    legal_codepoints = 98..122 # lowercase b..z
-    assert Anagram.Alphagram.to_alphagram("nappy?!!", legal_codepoints) == ["n", "p", "p", "y"]
+    is_legal_codepoint? = fn (codepoint) ->
+      <<codepoint_val::utf8>> = codepoint
+      codepoint_val in (?b..?z)
+    end
+    assert Anagram.Alphagram.to_alphagram("nappy?!!", is_legal_codepoint?) == ["n", "p", "p", "y"]
 
-    legal_codepoints = [97, 112] # a and p
-    assert Anagram.Alphagram.to_alphagram("nappy?!!", legal_codepoints) == ["a", "p", "p"]
+    is_legal_codepoint? = fn (codepoint) ->
+      <<codepoint_val::utf8>> = codepoint
+      codepoint_val in [?a, ?p]
+    end
+
+    assert Anagram.Alphagram.to_alphagram("nappy?!!", is_legal_codepoint?) == ["a", "p", "p"]
   end
 
   test "subtracting nothing from a list" do
