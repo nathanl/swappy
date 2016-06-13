@@ -59,11 +59,9 @@ defmodule Anagram do
   end
 
   # completely done moving right through the anagram tree
-  def anagrams_for_children_and_bags([], acc), do: acc
+  def anagrams_for_children_and_bags({[], []}, acc), do: acc
 
-  def anagrams_for_children_and_bags([{bag, child}|rest]=children_and_bags, acc) do
-    children = children_and_bags |> Enum.map(&elem(&1, 1))
-
+  def anagrams_for_children_and_bags({[bag|bags_t]=bags, [child|child_t]=children}, acc) do
     newly_found_anagrams = case bag do
       [] -> 
         # found a leaf
@@ -75,17 +73,17 @@ defmodule Anagram do
     end
 
     # keep moving right through the anagram tree
-    anagrams_for_children_and_bags(rest, newly_found_anagrams ++ acc)
+    anagrams_for_children_and_bags({bags_t, child_t}, newly_found_anagrams ++ acc)
   end
 
   # extracted_word_and_phrase_pairs
   # children
   def children_and_bags(bag, possible_children) do
     possible_children
-    |> Enum.reduce([], fn (possible_child, acc) ->
+    |> Enum.reduce({[], []}, fn (possible_child, {bags, children}) ->
       case Anagram.Alphagram.without(bag, possible_child) do
-        {:ok, remaining_bag, child} -> [ {remaining_bag, child} | acc]
-        _ -> acc
+        {:ok, remaining_bag, child} -> { [remaining_bag|bags], [child|children] }
+        _ -> {bags, children}
       end
     end)
   end
