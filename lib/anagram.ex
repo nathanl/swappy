@@ -30,7 +30,9 @@ defmodule Anagram do
       def anagrams_of(phrase, wordlist) do
         dict          = Anagram.Dictionary.to_dictionary(wordlist, &legal_codepoint?/1)
         dict_entries  = Map.keys(dict) # TODO - make this ordered like input dict
-        anagrams = Anagram.of(Anagram.Alphagram.to_alphagram(phrase, &legal_codepoint?/1), dict_entries)
+        phrase_alphagram = Anagram.Alphagram.to_alphagram(phrase, &legal_codepoint?/1)
+        usable_entries = Anagram.usable_entries_for(dict_entries, phrase_alphagram)
+        anagrams = Anagram.of(usable_entries, [])
         anagrams |> Enum.map(&Anagram.human_readable(&1, dict)) |> List.flatten
       end
 
@@ -52,33 +54,24 @@ defmodule Anagram do
 
   end
 
-  def of([], _dict_entries) do
-    [[]]
-  end
+  # completely done moving right through the anagram tree
+  def of([], acc), do: acc
 
-  # catbat
-  # set([["a", "b", "t"], ["a", "c", "t"]], ...)
-  # phrase is a alphagram; dict_entries is a set of alphagrams
-  # return a set of answers - each answer is a list of alphagrams,
-  # each answer contains exactly the letters of the input phrase
-  # dict_entries is an enumerable.
-  # returns a Set.
-  def of(phrase, dict_entries) do
-    usable_entries = usable_entries_for(dict_entries, phrase)
+  def of([{phrase_without_entry, entry}|rest]=usable_entries, acc) do
+    dict_entries = usable_entries |> Enum.map(&elem(&1, 1))
 
-    init_acc = %{dict: usable_entries |> Enum.map(&elem(&1, 1)), results: []}
-    %{results: results} = Enum.reduce(usable_entries, init_acc, fn({phrase_without_entry, entry}, acc) ->
-      anagrams_without_entry = Anagram.of(phrase_without_entry, acc.dict)
+    newly_found_anagrams = case phrase_without_entry do
+      [] -> 
+        # found a leaf
+        [ [entry] ]
+      _ ->
+        # search downward in the anagram tree
+        anagrams_without_entry = Anagram.of(usable_entries_for(dict_entries, phrase_without_entry), [])
+        Enum.map(anagrams_without_entry, &([entry|&1]))
+    end
 
-      new_results = Enum.reduce(anagrams_without_entry, acc.results, fn (anagram_without_entry, results) ->
-        anagram_with_entry = [entry | anagram_without_entry]
-        [anagram_with_entry | results]
-      end)
-
-      %{dict: tl(acc.dict), results: new_results}
-    end)
-
-    results
+    # keep moving right through the anagram tree
+    Anagram.of(rest, newly_found_anagrams ++ acc)
   end
 
   def usable_entries_for(dict_entries, phrase) do

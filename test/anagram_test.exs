@@ -21,7 +21,7 @@ defmodule AnagramTest do
 
   test "can handle duplicate words in the input phrase" do
     result = BasicAnagramUser.anagrams_of("apple racecar apple", ["race", "car", "apple", "racecar"])
-    assert result == ["apple racecar apple", "car apple race apple", ]
+    assert result == ["car apple race apple", "apple racecar apple"]
   end
 
   test "can find words with apostrophes, like 'I'm'" do
