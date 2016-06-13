@@ -29,10 +29,9 @@ defmodule Anagram do
       # wordlist is a list of strings
       def anagrams_of(phrase, wordlist) do
         dict          = Anagram.Dictionary.to_dictionary(wordlist, &legal_codepoint?/1)
-        dict_entries  = Map.keys(dict) # TODO - make this ordered like input dict
-        phrase_alphagram = Anagram.Alphagram.to_alphagram(phrase, &legal_codepoint?/1)
-        usable_entries = Anagram.usable_entries_for(dict_entries, phrase_alphagram)
-        anagrams = Anagram.of(usable_entries, [])
+        possible_children  = Map.keys(dict) # TODO - make this ordered like input dict
+        initial_bag = Anagram.Alphagram.to_alphagram(phrase, &legal_codepoint?/1)
+        anagrams = Anagram.generate_anagrams(initial_bag, possible_children)
         anagrams |> Enum.map(&Anagram.human_readable(&1, dict)) |> List.flatten
       end
 
@@ -54,31 +53,38 @@ defmodule Anagram do
 
   end
 
+  def generate_anagrams(bag, possible_children) do
+    children_and_bags = children_and_bags(bag, possible_children)
+    anagrams_for_children_and_bags(children_and_bags, [])
+  end
+
   # completely done moving right through the anagram tree
-  def of([], acc), do: acc
+  def anagrams_for_children_and_bags([], acc), do: acc
 
-  def of([{phrase_without_entry, entry}|rest]=usable_entries, acc) do
-    dict_entries = usable_entries |> Enum.map(&elem(&1, 1))
+  def anagrams_for_children_and_bags([{bag, child}|rest]=children_and_bags, acc) do
+    children = children_and_bags |> Enum.map(&elem(&1, 1))
 
-    newly_found_anagrams = case phrase_without_entry do
+    newly_found_anagrams = case bag do
       [] -> 
         # found a leaf
-        [ [entry] ]
+        [ [child] ]
       _ ->
         # search downward in the anagram tree
-        anagrams_without_entry = Anagram.of(usable_entries_for(dict_entries, phrase_without_entry), [])
-        Enum.map(anagrams_without_entry, &([entry|&1]))
+        anagrams_without_child = Anagram.generate_anagrams(bag, children)
+        Enum.map(anagrams_without_child, &([child|&1]))
     end
 
     # keep moving right through the anagram tree
-    Anagram.of(rest, newly_found_anagrams ++ acc)
+    anagrams_for_children_and_bags(rest, newly_found_anagrams ++ acc)
   end
 
-  def usable_entries_for(dict_entries, phrase) do
-    dict_entries
-    |> Enum.reduce([], fn (entry, acc) ->
-      case Anagram.Alphagram.without(phrase, entry) do
-        {:ok, outer, inner} -> [ {outer, inner} | acc]
+  # extracted_word_and_phrase_pairs
+  # children
+  def children_and_bags(bag, possible_children) do
+    possible_children
+    |> Enum.reduce([], fn (possible_child, acc) ->
+      case Anagram.Alphagram.without(bag, possible_child) do
+        {:ok, remaining_bag, child} -> [ {remaining_bag, child} | acc]
         _ -> acc
       end
     end)
