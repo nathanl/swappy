@@ -14,7 +14,7 @@ defmodule Mix.Tasks.Performance do
 
     IO.puts "loaded the dictionary file - size #{Enum.count(dict)}"
     start = timey_time_time_time
-    results = BasicAnagramUser.of("racecars are rad me lad", dict)
+    results = BasicAnagramUser.anagrams_of("racecars are rad me lad", dict)
     the_end = timey_time_time_time
     IO.puts "anagram generation took #{the_end - start}"
     IO.puts "result count: #{Enum.count(results)}"
