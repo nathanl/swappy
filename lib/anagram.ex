@@ -78,12 +78,20 @@ defmodule Anagram do
     anagrams_for_words_and_bags({words_t, bags_t}, newly_found_anagrams ++ acc)
   end
 
-  def length([], n) do
-    n
-  end
-  def length([h|t], n) do
-    length(t, n+1)
-  end
+  # start queue process
+  # send it top-level job
+  #   queue process does this:
+  #     if counter 0 and no jobs left, return results
+  #     if counter at max, listen for answers and worker dead
+  #     if counter not at max, also listen for jobs
+  #     when receive a job, spawn a worker for it and inc counter and recurse
+  #     when receive an answer, add to acc and recurse
+  #     when receive a "worker dead", dec counter, recurse
+  #
+  # strategies
+  #   - go until everything done
+  #   - go until enough, then drop everything on the floor
+  #   - go until enough, wait for remaining workers, return answers and partials
 
   # TODO temp code to test create_jobs
   # We could put an accumulator on process_queue to accumulate found anagrams.
@@ -97,12 +105,8 @@ defmodule Anagram do
         count = emit_anagrams(found, dictionary, anagram_count)
         process_queue(rest_of_jobs, n-1, anagram_count+count, dictionary)
       {:more_jobs, new_jobs} -> 
-        process_queue(prependall(new_jobs, rest_of_jobs), n-1 + Enum.count(new_jobs), anagram_count, dictionary)
+        process_queue(new_jobs ++ rest_of_jobs, n-1 + Enum.count(new_jobs), anagram_count, dictionary)
     end
-  end
-  def prependall([], list2), do: list2
-  def prependall([h|t]=list1, list2) do
-    prependall(t, [h|list2])
   end
 
   def process_one_job([found: found, bag: [], possible_words: _]) do
