@@ -85,6 +85,41 @@ defmodule Anagram do
     length(t, n+1)
   end
 
+  # TODO temp code to test create_jobs
+  # We could put an accumulator on process_queue to accumulate found anagrams.
+  # But we want to send them to some supervisor one at a time, right?
+  def process_queue([], _, anagram_count, dictionary) do
+    IO.puts("All done with #{anagram_count} anagrams")
+  end
+  def process_queue([job|rest_of_jobs], n, anagram_count, dictionary) do
+    case process_one_job(job) do
+      {:anagram, found} -> 
+        count = emit_anagrams(found, dictionary, anagram_count)
+        process_queue(rest_of_jobs, n-1, anagram_count+count, dictionary)
+      {:more_jobs, new_jobs} -> 
+        process_queue(prependall(new_jobs, rest_of_jobs), n-1 + Enum.count(new_jobs), anagram_count, dictionary)
+    end
+  end
+  def prependall([], list2), do: list2
+  def prependall([h|t]=list1, list2) do
+    prependall(t, [h|list2])
+  end
+
+  def process_one_job([found: found, bag: [], possible_words: _]) do
+    {:anagram, found}
+  end
+  def process_one_job([found: found, bag: bag, possible_words: possible_words]) do
+    {:more_jobs, create_jobs(bag, possible_words, found)}
+  end
+  def emit_anagrams(found, dictionary, n) do
+    #TODO we already have a function that does this
+    #TODO we could 'send' this to a supervisor instead
+    anagrams = human_readable found, dictionary
+    #anagrams |> Enum.each(&(IO.puts "Anagram group #{n}: #{&1}"))
+    Enum.count anagrams
+  end
+  #TODO end temp code
+
   def create_jobs(bag, possible_words, found) do
     {words, bags} = find_words(bag, possible_words)
     jobs(words, bags, found, [])
@@ -93,7 +128,7 @@ defmodule Anagram do
   def jobs([]=_words, []=_bags, _found, acc), do: acc
   def jobs([word|words_t]=words, [bag|bags_t], found, acc) do
     one_job = [ found: [word|found], bag: bag, possible_words: words ]
-    jobs(words_t, bags_t, found, acc ++ [one_job])
+    jobs(words_t, bags_t, found, [one_job|acc])
   end
 
   def find_words(bag, possible_words) do

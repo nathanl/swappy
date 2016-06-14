@@ -83,4 +83,18 @@ defmodule AnagramTest do
       [ found: ags(["not", "boat"]), bag: ag("o"),  possible_words: ags(["not"])],
     ]
   end
+
+  test "it works" do
+    IO.puts "Make"
+    dictionary = Anagram.Dictionary.load_file("~/code/anagram_wordlists/pruned_wordlist_by_length.txt") |> Anagram.Dictionary.to_dictionary
+    wordlist =  Map.keys dictionary
+    IO.puts "Made"
+    Anagram.process_queue(
+      [
+        [
+          found: [], bag: ag("racecars are rad me lad"), possible_words: wordlist
+        ]
+      ], 1, 0, dictionary
+    )
+  end
 end
