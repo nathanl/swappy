@@ -1,12 +1,12 @@
 defmodule Anagram.Queue do
   @max_workers 2
-  @max_wait_time 2_000
 
   # This strategy is "go until everything is done". Other possible strategies
   #  - go until enough, then drop everything else on the floor
   #  - go until enough, wait for remaining workers, return answers and partials so we can continue later
 
   def process(job) do
+    # IO.inspect ["using the queue implementation with max workers", @max_workers]
     spawner_pid = self
     queue_pid = spawn_link fn ->
       manage_queue(spawner_pid, [], [], 0)
@@ -32,12 +32,12 @@ defmodule Anagram.Queue do
       {:anagram, found} ->
         manage_queue(spawner_pid, [found|results], jobs, worker_count)
       :worker_dead ->
-        manage_queue(spawner_pid, results, jobs, worker_count - 1)
-    # NOTE: this is an upper bound on how long we'll wait for a message (eg for
-    # a job to complete), but it's also a lower bound on how long it takes to
-    # decide we're done, which stinks when the input is very small.
-    after @max_wait_time ->
-        send(spawner_pid, {:results, results})
+        worker_count = worker_count - 1
+        if worker_count == 0 && Enum.empty?(jobs) do
+          send(spawner_pid, {:results, results})
+        else
+          manage_queue(spawner_pid, results, jobs, worker_count)
+        end
     end
   end
 
