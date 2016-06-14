@@ -33,6 +33,9 @@ defmodule Anagram.Queue do
         manage_queue(spawner_pid, [found|results], jobs, worker_count)
       :worker_dead ->
         manage_queue(spawner_pid, results, jobs, worker_count - 1)
+    # NOTE: this is an upper bound on how long we'll wait for a message (eg for
+    # a job to complete), but it's also a lower bound on how long it takes to
+    # decide we're done, which stinks when the input is very small.
     after @max_wait_time ->
         send(spawner_pid, {:results, results})
     end
