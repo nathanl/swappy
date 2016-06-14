@@ -1,5 +1,5 @@
 defmodule Anagram.Queue do
-  @max_workers 2
+  @max_workers 1
 
   # This strategy is "go until everything is done". Other possible strategies
   #  - go until enough, then drop everything else on the floor

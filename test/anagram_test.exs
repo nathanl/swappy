@@ -6,27 +6,27 @@ defmodule AnagramTest do
 
   test "can find the only possible anagrams using a tiny dictionary" do
     result = BasicAnagramUser.anagrams_of("onto", ["on", "to"])
-    assert result == ["on to"]
+    assert result == ["to on"]
   end
 
   test "ignores punctuation, capitalization and spaces" do
     result = BasicAnagramUser.anagrams_of("On, To!", ["on", "to"])
-    assert result == ["on to"]
+    assert result == ["to on"]
   end
 
   test "can find human-readable anagrams of a phrase using a dictionary" do
     result = BasicAnagramUser.anagrams_of("racecar", ["arc", "are", "car", "care", "race"])
-    assert result == ["race car", "race arc", "care car", "care arc"]
+    assert result == ["car race", "car care", "arc race", "arc care"]
   end
 
   test "can handle duplicate words in the input phrase" do
     result = BasicAnagramUser.anagrams_of("apple racecar apple", ["race", "car", "apple", "racecar"])
-    assert result == ["car apple race apple", "apple racecar apple"]
+    assert result == ["apple race apple car", "apple racecar apple"]
   end
 
   test "can find words with apostrophes, like 'I'm'" do
     result = BasicAnagramUser.anagrams_of("I'm cool", ["I'm", "cool", "mi"])
-    assert result == ["cool mi", "cool I'm"]
+    assert result == ["mi cool", "I'm cool"]
   end
 
   test "uses the built-in default dictionary if none is specified" do
@@ -35,7 +35,7 @@ defmodule AnagramTest do
 
   test "can find anagrams using the built-in default dictionary" do
     result = BasicAnagramUser.anagrams_of("onto")
-    assert result == ["onto", "no to", "on to", "ton o", "not o"]
+    assert result == ["ton o", "not o", "to no", "to on", "onto"]
   end
 
   test "can find anagrams using a dictionary defined in the user's module" do
@@ -45,7 +45,7 @@ defmodule AnagramTest do
 
   test "uses legal_codepoints as defined in the user's module" do
     result = CustomAnagramUser.anagrams_of("mañana", :tiny_spanish)
-    assert result == ["mañana", "ña mana", "maña na"]
+    assert result == ["mañana", "mana ña", "na maña"]
   end
 
   test "human_readable builds a 'cartesian join' of words the alphagrams can spell" do
