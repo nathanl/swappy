@@ -1,64 +1,54 @@
 defmodule Anagram.Queue do
-  @max_workers 8
+  @max_workers 2
+  @max_wait_time 2_000
 
-  # start queue process
-  # send it top-level job
-  #   queue process does this:
-  #     if counter 0 and no jobs left, return results
-  #     if counter at max, listen for answers and worker dead
-  #     if counter not at max, also listen for jobs
-  #     when receive a job, spawn a worker for it and inc counter and recurse
-  #     when receive an answer, add to acc and recurse
-  #     when receive a "worker dead", dec counter, recurse
-  #
-  # strategies
-  #   - go until everything done
-  #   - go until enough, then drop everything on the floor
-  #   - go until enough, wait for remaining workers, return answers and partials
+  # This strategy is "go until everything is done". Other possible strategies
+  #  - go until enough, then drop everything else on the floor
+  #  - go until enough, wait for remaining workers, return answers and partials so we can continue later
 
   def process(job) do
     spawner_pid = self
-    spawn_link fn ->
-      manage_queue(spawner_pid, [], [job], 0)
+    queue_pid = spawn_link fn ->
+      manage_queue(spawner_pid, [], [], 0)
     end
+    send(queue_pid, {:new_job, job})
     receive do
-      [:results, results] -> results
+      {:results, raw_anagrams} -> raw_anagrams
     end
+  end
+
+  def manage_queue(spawner_pid, results, [job|jobs_t], worker_count) when worker_count < @max_workers do
+    queue_pid = self
+    spawn_link fn ->
+      work(queue_pid, job)
+    end
+    manage_queue(spawner_pid, results, jobs_t, worker_count + 1)
   end
 
   def manage_queue(spawner_pid, results, jobs, worker_count) do
-    if worker_count == @max_workers do
-      receive do
-        :worker_dead ->
-          manage_queue(spawner_pid, results, jobs, worker_count - 1)
-        {:anagram, found} ->
-          manage_queue(spawner_pid, [found|results], jobs, worker_count)
-        {:anagram, found} ->
-          manage_queue(spawner_pid, [found|results], jobs, worker_count)
-      end
-    else
-      receive do
-        :worker_dead ->
-          manage_queue(spawner_pid, results, jobs, worker_count - 1)
-        {:anagram, found} ->
-          manage_queue(spawner_pid, [found|results], jobs, worker_count)
-        {:anagram, found} ->
-          manage_queue(spawner_pid, [found|results], jobs, worker_count)
-        'heres a job' ->
-          queue_pid = self
-          spawn_link fn ->
-            results = process_one_job
-          end
-          manage_queue(spawner_pid, results, jobs, worker_count + 1)
-      end
-    # worker_count == 0 and mah-mailbox-be-empty  -> # after N ms...
-    #   send(spawner_pid, [:results, results])
-    # end
+    receive do
+      {:new_job, job} ->
+        manage_queue(spawner_pid, results, [job|jobs], worker_count)
+      {:anagram, found} ->
+        manage_queue(spawner_pid, [found|results], jobs, worker_count)
+      :worker_dead ->
+        manage_queue(spawner_pid, results, jobs, worker_count - 1)
+    after @max_wait_time ->
+        send(spawner_pid, {:results, results})
+    end
   end
 
-    job = [found: [], possible_words: possible_words, bag: bag]
-    result = Anagram.Queue.process(job)
-
-
+  def work(queue_pid, job) do
+    job_result = Anagram.process_one_job(job)
+    case job_result do
+      {:anagram, found} ->
+        send(queue_pid, {:anagram, found})
+      {:more_jobs, jobs} ->
+        Enum.each(jobs, fn (job) ->
+          send(queue_pid, {:new_job, job})
+        end)
+    end
+    send(queue_pid, :worker_dead)
+  end
 
 end

@@ -32,6 +32,7 @@ defmodule Anagram do
         possible_words  = Map.keys(dict) # TODO - make this ordered like input dict
         initial_bag = Anagram.Alphagram.to_alphagram(phrase, &legal_codepoint?/1)
         anagrams = Anagram.generate_anagrams(initial_bag, possible_words)
+        # anagrams = Anagram.Queue.process([found: [], bag: initial_bag, possible_words: possible_words])
         anagrams |> Enum.map(&Anagram.human_readable(&1, dict)) |> List.flatten
       end
 
@@ -63,7 +64,7 @@ defmodule Anagram do
   # completely done moving right through the anagram tree
   def anagrams_for_words_and_bags({[], []}, acc), do: acc
 
-  def anagrams_for_words_and_bags({[word|words_t]=words, [bag|bags_t]=bags}, acc) do
+  def anagrams_for_words_and_bags({[word|words_t]=words, [bag|bags_t]=_bags}, acc) do
     newly_found_anagrams = case bag do
       [] -> 
         # found a leaf
@@ -78,25 +79,10 @@ defmodule Anagram do
     anagrams_for_words_and_bags({words_t, bags_t}, newly_found_anagrams ++ acc)
   end
 
-  # start queue process
-  # send it top-level job
-  #   queue process does this:
-  #     if counter 0 and no jobs left, return results
-  #     if counter at max, listen for answers and worker dead
-  #     if counter not at max, also listen for jobs
-  #     when receive a job, spawn a worker for it and inc counter and recurse
-  #     when receive an answer, add to acc and recurse
-  #     when receive a "worker dead", dec counter, recurse
-  #
-  # strategies
-  #   - go until everything done
-  #   - go until enough, then drop everything on the floor
-  #   - go until enough, wait for remaining workers, return answers and partials
-
   # TODO temp code to test create_jobs
   # We could put an accumulator on process_queue to accumulate found anagrams.
   # But we want to send them to some supervisor one at a time, right?
-  def process_queue([], _, anagram_count, dictionary) do
+  def process_queue([], _, anagram_count, _dictionary) do
     IO.puts("All done with #{anagram_count} anagrams")
   end
   def process_queue([job|rest_of_jobs], n, anagram_count, dictionary) do
@@ -115,7 +101,7 @@ defmodule Anagram do
   def process_one_job([found: found, bag: bag, possible_words: possible_words]) do
     {:more_jobs, create_jobs(bag, possible_words, found)}
   end
-  def emit_anagrams(found, dictionary, n) do
+  def emit_anagrams(found, dictionary, _n) do
     #TODO we already have a function that does this
     #TODO we could 'send' this to a supervisor instead
     anagrams = human_readable found, dictionary
