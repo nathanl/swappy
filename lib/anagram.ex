@@ -88,6 +88,9 @@ defmodule Anagram do
     end)
   end
 
+  def expand(phrase, dict, found) do
+  end
+
   # Convert a list of alphagrams to a list of human-readable anagrams
   # e.g. [ alphagram("race"), alphagram("car") ] =>
   # [ "care car", "race car" ]
