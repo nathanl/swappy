@@ -1,4 +1,6 @@
 defmodule Anagram.Queue do
+  # TODO - why is this slower than non-queue implementation? And WHY WHY does
+  # increasing @max_workers slow it down? Would maintaining a worker pool help?
   @max_workers 1
 
   # This strategy is "go until everything is done". Other possible strategies
