@@ -27,7 +27,7 @@ defmodule Anagram do
       # Top level function
       # phrase is a string
       # wordlist is a list of strings
-      def anagrams_of(phrase, wordlist) do
+      def anagrams_of(phrase, wordlist) when is_list(wordlist) do
         dict          = Anagram.Dictionary.to_dictionary(wordlist, &legal_codepoint?/1)
         possible_words  = Map.keys(dict) # TODO - make this ordered like input dict
         initial_bag = Anagram.Alphagram.to_alphagram(phrase, &legal_codepoint?/1)
