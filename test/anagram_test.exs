@@ -62,27 +62,25 @@ defmodule AnagramTest do
   def ag(str), do: Anagram.Alphagram.to_alphagram(str)
   def ags(list), do: Enum.map(list, &ag/1)
 
-  test "expand expands the search tree by one level" do
-    phrase = ag("onto")
-    dict   = ags(["hi", "to", "on", "not"])
+  test "create_jobs makes jobs for the next level of the search tree" do
+    bag = ag("onto")
+    possible_words   = ags(["hi", "to", "on", "not"])
     found  = ags([])
-    filtered = ags(["to", "on", "not"])
-    assert(Anagram.expand(phrase, dict, found)) == [
-      [ found: ags(["to" ]), phrase: ag("on"), dict: ags(["to", "on", "not"])],
-      [ found: ags(["on" ]), phrase: ag("to"), dict: ags(["on", "not"])],
-      [ found: ags(["not"]), phrase: ag("o"),  dict: ags(["not"])],
+    assert(Anagram.create_jobs(bag, possible_words, found)) == [
+      [ found: ags(["to" ]), bag: ag("on"), possible_words: ags(["to", "on", "not"])],
+      [ found: ags(["on" ]), bag: ag("to"), possible_words: ags(["on", "not"])],
+      [ found: ags(["not"]), bag: ag("o"),  possible_words: ags(["not"])],
     ]
   end
 
-  test "expand adds to the list of found words" do
-    phrase = ag("onto")
-    dict   = ags(["hi", "to", "on", "not"])
+  test "create_jobs adds to the list of found words" do
+    bag = ag("onto")
+    possible_words   = ags(["hi", "to", "on", "not"])
     found  = ags(["boat"])
-    filtered = ags(["to", "on", "not"])
-    assert(Anagram.expand(phrase, dict, found)) == [
-      [ found: ags(["to" , "boat"]), phrase: ag("on"), dict: ags(["to", "on", "not"])],
-      [ found: ags(["on" , "boat"]), phrase: ag("to"), dict: ags(["on", "not"])],
-      [ found: ags(["not", "boat"]), phrase: ag("o"),  dict: ags(["not"])],
+    assert(Anagram.create_jobs(bag, possible_words, found)) == [
+      [ found: ags(["to" , "boat"]), bag: ag("on"), possible_words: ags(["to", "on", "not"])],
+      [ found: ags(["on" , "boat"]), bag: ag("to"), possible_words: ags(["on", "not"])],
+      [ found: ags(["not", "boat"]), bag: ag("o"),  possible_words: ags(["not"])],
     ]
   end
 end

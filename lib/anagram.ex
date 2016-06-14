@@ -78,6 +78,24 @@ defmodule Anagram do
     anagrams_for_words_and_bags({words_t, bags_t}, newly_found_anagrams ++ acc)
   end
 
+  def length([], n) do
+    n
+  end
+  def length([h|t], n) do
+    length(t, n+1)
+  end
+
+  def create_jobs(bag, possible_words, found) do
+    {words, bags} = find_words(bag, possible_words)
+    jobs(words, bags, found, [])
+  end
+
+  def jobs([]=_words, []=_bags, _found, acc), do: acc
+  def jobs([word|words_t]=words, [bag|bags_t], found, acc) do
+    one_job = [ found: [word|found], bag: bag, possible_words: words ]
+    jobs(words_t, bags_t, found, acc ++ [one_job])
+  end
+
   def find_words(bag, possible_words) do
     possible_words
     |> Enum.reduce({[], []}, fn (possible_word, {words, bags}) ->
@@ -86,9 +104,6 @@ defmodule Anagram do
         _ -> {words, bags}
       end
     end)
-  end
-
-  def expand(phrase, dict, found) do
   end
 
   # Convert a list of alphagrams to a list of human-readable anagrams
