@@ -97,4 +97,12 @@ defmodule AnagramTest do
       ], 1, 0, dictionary
     )
   end
+
+  test "it can do all this crap in processes" do
+    bag = ag("onto")
+    possible_words   = ags(["hi", "to", "on", "not"])
+    job = [found: [], possible_words: possible_words, bag: bag]
+    result = Anagram.Queue.process(job)
+    assert result == ["on to"]
+  end
 end
