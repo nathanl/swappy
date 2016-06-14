@@ -3,25 +3,25 @@ defmodule Anagram.AlphagramTest do
   doctest Anagram.Alphagram
 
   test "converting a string to an alphagram" do
-    assert Anagram.Alphagram.to_alphagram("nappy") == ["a", "n", "p", "p", "y"]
+    assert Anagram.Alphagram.to_alphagram("nappy") == [:a, :n, :p, :p, :y]
   end
 
   test "converting a string to an alphagram and removing illegal codepoints" do
     # Assumes default legal codepoints
-    assert Anagram.Alphagram.to_alphagram("nappy?!!") == ["a", "n", "p", "p", "y"]
+    assert Anagram.Alphagram.to_alphagram("nappy?!!") == [:a, :n, :p, :p, :y]
 
     is_legal_codepoint? = fn (codepoint) ->
       <<codepoint_val::utf8>> = codepoint
       codepoint_val in (?b..?z)
     end
-    assert Anagram.Alphagram.to_alphagram("nappy?!!", is_legal_codepoint?) == ["n", "p", "p", "y"]
+    assert Anagram.Alphagram.to_alphagram("nappy?!!", is_legal_codepoint?) == [:n, :p, :p, :y]
 
     is_legal_codepoint? = fn (codepoint) ->
       <<codepoint_val::utf8>> = codepoint
       codepoint_val in [?a, ?p]
     end
 
-    assert Anagram.Alphagram.to_alphagram("nappy?!!", is_legal_codepoint?) == ["a", "p", "p"]
+    assert Anagram.Alphagram.to_alphagram("nappy?!!", is_legal_codepoint?) == [:a, :p, :p]
   end
 
   test "subtracting nothing from a list" do

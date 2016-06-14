@@ -18,6 +18,7 @@ defmodule Anagram.Alphagram do
     |> String.codepoints
     |> Enum.filter(is_legal_codepoint?)
     |> Enum.sort
+    |> Enum.map(&String.to_atom/1)
   end
 
   # *** This function relies on knowledge that alphagrams are sorted ***
