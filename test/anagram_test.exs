@@ -35,7 +35,7 @@ defmodule AnagramTest do
 
   test "can find anagrams using the built-in default dictionary" do
     result = BasicAnagramUser.anagrams_of("onto")
-    assert result == ["ton o", "not o", "to no", "to on", "onto"]
+    assert result == ["onto", "o ton", "o not", "to no", "to on"]
   end
 
   test "can find anagrams using a dictionary defined in the user's module" do
@@ -66,10 +66,10 @@ defmodule AnagramTest do
     bag = ag("onto")
     possible_words   = ags(["hi", "to", "on", "not"])
     found  = ags([])
-    assert(Anagram.create_jobs(bag, possible_words, found)) == [
-      [ found: ags(["to" ]), bag: ag("on"), possible_words: ags(["to", "on", "not"])],
-      [ found: ags(["on" ]), bag: ag("to"), possible_words: ags(["on", "not"])],
-      [ found: ags(["not"]), bag: ag("o"),  possible_words: ags(["not"])],
+    assert Anagram.create_jobs(bag, possible_words, found) == [
+      [ found: ags(["to"]), bag: ag("on"),  possible_words: ags(["to"])],
+      [ found: ags(["on" ]), bag: ag("to"), possible_words: ags(["on", "to"])],
+      [ found: ags(["not" ]), bag: ag("o"), possible_words: ags(["not", "on", "to"])],
     ]
   end
 
@@ -77,10 +77,10 @@ defmodule AnagramTest do
     bag = ag("onto")
     possible_words   = ags(["hi", "to", "on", "not"])
     found  = ags(["boat"])
-    assert(Anagram.create_jobs(bag, possible_words, found)) == [
-      [ found: ags(["to" , "boat"]), bag: ag("on"), possible_words: ags(["to", "on", "not"])],
-      [ found: ags(["on" , "boat"]), bag: ag("to"), possible_words: ags(["on", "not"])],
-      [ found: ags(["not", "boat"]), bag: ag("o"),  possible_words: ags(["not"])],
+    assert Anagram.create_jobs(bag, possible_words, found)  == [
+      [ found: ags(["to", "boat"]), bag: ag("on"),  possible_words: ags(["to"])],
+      [ found: ags(["on" , "boat"]), bag: ag("to"), possible_words: ags(["on", "to"])],
+      [ found: ags(["not" , "boat"]), bag: ag("o"), possible_words: ags(["not", "on", "to"])],
     ]
   end
 
