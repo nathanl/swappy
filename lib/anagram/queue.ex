@@ -31,20 +31,39 @@ defmodule Anagram.Queue do
 
   # can't assign work
   def manage_queue(spawner_pid, results, jobs, idle_workers) do
+    if rem(length(results), 100) == 0, do: IO.puts "results #{length(results)}" 
     receive do
-      {{:more_jobs, new_jobs}, worker_pid} ->
-        manage_queue(spawner_pid, results, new_jobs ++ jobs, [worker_pid|idle_workers])
-      {{:anagram, found}, worker_pid} ->
-        manage_queue(spawner_pid, [found|results], jobs, [worker_pid|idle_workers])
+      {:worker_results, new_anagrams, new_jobs, worker_pid} ->
+        manage_queue(spawner_pid, results ++ new_anagrams, new_jobs ++ jobs, [worker_pid|idle_workers])
+      # Don't need thse right now
+      # {{:more_jobs, new_jobs}, worker_pid} ->
+      #   manage_queue(spawner_pid, results, new_jobs ++ jobs, [worker_pid|idle_workers])
+      # {{:anagram, found}, worker_pid} ->
+      #   manage_queue(spawner_pid, [found|results], jobs, [worker_pid|idle_workers])
     end
   end
 
   def work() do
     receive do
       {:job, queue_pid, job} ->
-        job_result = Anagram.process_one_job(job)
-        send(queue_pid, {job_result, self})
-        work()
+        {anagrams, jobs} = do_work([job], [], 0)
+        send(queue_pid, {:worker_results, anagrams, jobs, self})
+    end
+    work()
+  end
+
+  def do_work([], found_anagrams, _completed_jobs) do
+    {found_anagrams, []}
+  end
+  def do_work(jobs, found_anagrams, 100_000=_completed_jobs) do
+    {found_anagrams, jobs}
+  end
+  def do_work([job|jobs_t], found_anagrams, completed_jobs) do
+    case Anagram.process_one_job(job) do
+      {:anagram, anagram} ->
+        do_work(jobs_t, [anagram|found_anagrams], completed_jobs+1)
+      {:more_jobs, jobs} ->
+        do_work(jobs ++ jobs_t, found_anagrams, completed_jobs+1)
     end
   end
 
