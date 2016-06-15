@@ -1,6 +1,6 @@
 defmodule Anagram.Queue do
-  # TODO - why is this slower than non-queue implementation? And WHY WHY does
-  # increasing @max_workers slow it down? Would maintaining a worker pool help?
+  # TODO - why is this slower than `git tag top_level` implementation? And WHY WHY does
+  # increasing @max_workers slow it down?
   @max_workers 4
 
   # This strategy is "go until everything is done". Other possible strategies
