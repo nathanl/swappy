@@ -1,7 +1,7 @@
 defmodule Anagram.Queue do
   # TODO - why is this slower than non-queue implementation? And WHY WHY does
   # increasing @max_workers slow it down? Would maintaining a worker pool help?
-  @max_workers 1
+  @max_workers 4
 
   # This strategy is "go until everything is done". Other possible strategies
   #  - go until enough, then drop everything else on the floor
@@ -9,48 +9,43 @@ defmodule Anagram.Queue do
 
   def process(job) do
     spawner_pid = self
-    queue_pid = spawn_link fn ->
-      manage_queue(spawner_pid, [], [job], 0)
+    idle_workers = 1..@max_workers |> Enum.map(fn _ -> spawn_link &(work/0) end)
+    spawn_link fn ->
+      manage_queue(spawner_pid, [], [job], idle_workers)
     end
     receive do
       {:results, raw_anagrams} -> raw_anagrams
     end
   end
 
-  def manage_queue(spawner_pid, results, []=_jobs, 0=_worker_count) do
+  # all done yayaayayayay
+  def manage_queue(spawner_pid, results, []=_jobs, idle_workers) when length(idle_workers) == @max_workers do
     send(spawner_pid, {:results, results})
   end
 
-  def manage_queue(spawner_pid, results, [job|jobs_t], worker_count) when worker_count < @max_workers do
-    queue_pid = self
-    spawn_link fn ->
-      work(queue_pid, job)
-    end
-    manage_queue(spawner_pid, results, jobs_t, worker_count + 1)
+  # can assign work
+  def manage_queue(spawner_pid, results, [job|jobs_t], [idle_worker|idle_workers_t]) do
+    send(idle_worker, {:job, self, job})
+    manage_queue(spawner_pid, results, jobs_t, idle_workers_t)
   end
 
-  def manage_queue(spawner_pid, results, jobs, worker_count) do
+  # can't assign work
+  def manage_queue(spawner_pid, results, jobs, idle_workers) do
     receive do
-      {:new_job, job} ->
-        manage_queue(spawner_pid, results, [job|jobs], worker_count)
-      {:anagram, found} ->
-        manage_queue(spawner_pid, [found|results], jobs, worker_count)
-      :worker_dead ->
-        manage_queue(spawner_pid, results, jobs, worker_count - 1)
+      {{:more_jobs, new_jobs}, worker_pid} ->
+        manage_queue(spawner_pid, results, new_jobs ++ jobs, [worker_pid|idle_workers])
+      {{:anagram, found}, worker_pid} ->
+        manage_queue(spawner_pid, [found|results], jobs, [worker_pid|idle_workers])
     end
   end
 
-  def work(queue_pid, job) do
-    job_result = Anagram.process_one_job(job)
-    case job_result do
-      {:anagram, found} ->
-        send(queue_pid, {:anagram, found})
-      {:more_jobs, jobs} ->
-        Enum.each(jobs, fn (job) ->
-          send(queue_pid, {:new_job, job})
-        end)
+  def work() do
+    receive do
+      {:job, queue_pid, job} ->
+        job_result = Anagram.process_one_job(job)
+        send(queue_pid, {job_result, self})
+        work()
     end
-    send(queue_pid, :worker_dead)
   end
 
 end

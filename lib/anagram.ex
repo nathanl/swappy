@@ -31,8 +31,8 @@ defmodule Anagram do
         dict          = Anagram.Dictionary.to_dictionary(wordlist, &legal_codepoint?/1)
         possible_words  = Map.keys(dict) |> Enum.sort # for deterministic test output
         initial_bag = Anagram.Alphagram.to_alphagram(phrase, &legal_codepoint?/1)
-        # anagrams = Anagram.generate_anagrams(initial_bag, possible_words)
-        anagrams = Anagram.Queue.process([found: [], bag: initial_bag, possible_words: possible_words])
+        anagrams = Anagram.generate_anagrams(initial_bag, possible_words)
+        # anagrams = Anagram.Queue.process([found: [], bag: initial_bag, possible_words: possible_words])
         anagrams |> Enum.map(&Anagram.human_readable(&1, dict)) |> List.flatten
       end
 

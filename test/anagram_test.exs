@@ -35,7 +35,7 @@ defmodule AnagramTest do
 
   test "can find anagrams using the built-in default dictionary" do
     result = BasicAnagramUser.anagrams_of("onto")
-    assert result == ["onto", "o ton", "o not", "to no", "to on"]
+    assert result == ["to no", "to on", "o ton", "o not", "onto"]
   end
 
   test "can find anagrams using a dictionary defined in the user's module" do
@@ -45,7 +45,7 @@ defmodule AnagramTest do
 
   test "uses legal_codepoints as defined in the user's module" do
     result = CustomAnagramUser.anagrams_of("mañana", :tiny_spanish)
-    assert result == ["mañana", "mana ña", "na maña"]
+    assert result == ["na maña", "mana ña", "mañana"]
   end
 
   test "human_readable builds a 'cartesian join' of words the alphagrams can spell" do
