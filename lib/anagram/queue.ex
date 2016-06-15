@@ -8,15 +8,17 @@ defmodule Anagram.Queue do
   #  - go until enough, wait for remaining workers, return answers and partials so we can continue later
 
   def process(job) do
-    # IO.inspect ["using the queue implementation with max workers", @max_workers]
     spawner_pid = self
     queue_pid = spawn_link fn ->
-      manage_queue(spawner_pid, [], [], 0)
+      manage_queue(spawner_pid, [], [job], 0)
     end
-    send(queue_pid, {:new_job, job})
     receive do
       {:results, raw_anagrams} -> raw_anagrams
     end
+  end
+
+  def manage_queue(spawner_pid, results, []=_jobs, 0=_worker_count) do
+    send(spawner_pid, {:results, results})
   end
 
   def manage_queue(spawner_pid, results, [job|jobs_t], worker_count) when worker_count < @max_workers do
@@ -34,12 +36,7 @@ defmodule Anagram.Queue do
       {:anagram, found} ->
         manage_queue(spawner_pid, [found|results], jobs, worker_count)
       :worker_dead ->
-        worker_count = worker_count - 1
-        if worker_count == 0 && Enum.empty?(jobs) do
-          send(spawner_pid, {:results, results})
-        else
-          manage_queue(spawner_pid, results, jobs, worker_count)
-        end
+        manage_queue(spawner_pid, results, jobs, worker_count - 1)
     end
   end
 
