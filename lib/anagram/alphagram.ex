@@ -1,23 +1,24 @@
 defmodule Anagram.Alphagram do
 
-  def legal_codepoint?(codepoint) do
-    <<codepoint_val::utf8>> = codepoint
-    codepoint_val in (?a..?z)
+  @default_legal_codepoints "abcdefghijklmnopqrstuvwxyz" |> String.codepoints
+  def default_legal_codepoints do
+    @default_legal_codepoints
   end
 
   # Convenience for to_alphagram/2; uses default list
   def to_alphagram(string) do
-    to_alphagram(string, &legal_codepoint?/1)
+    to_alphagram(string, default_legal_codepoints)
   end
 
   # Sorted, non-unique list of codepoints
   # "alpha" -> ["a", "a", "h", "l", "p"]
-  def to_alphagram(string, is_legal_codepoint?) do
+  def to_alphagram(string, legal_codepoints) do
     string
     |> String.downcase
     |> String.codepoints
-    |> Enum.filter(is_legal_codepoint?)
+    |> Enum.filter(&(&1 in legal_codepoints))
     |> Enum.sort
+    |> Enum.map(&String.to_atom/1)
   end
 
   # *** This function relies on knowledge that alphagrams are sorted ***

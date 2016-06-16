@@ -6,27 +6,27 @@ defmodule AnagramTest do
 
   test "can find the only possible anagrams using a tiny dictionary" do
     result = BasicAnagramUser.anagrams_of("onto", ["on", "to"])
-    assert result == ["on to"]
+    assert result == ["to on"]
   end
 
   test "ignores punctuation, capitalization and spaces" do
     result = BasicAnagramUser.anagrams_of("On, To!", ["on", "to"])
-    assert result == ["on to"]
+    assert result == ["to on"]
   end
 
   test "can find human-readable anagrams of a phrase using a dictionary" do
     result = BasicAnagramUser.anagrams_of("racecar", ["arc", "are", "car", "care", "race"])
-    assert result == ["race car", "race arc", "care car", "care arc"]
+    assert result == ["car race", "car care", "arc race", "arc care"]
   end
 
   test "can handle duplicate words in the input phrase" do
     result = BasicAnagramUser.anagrams_of("apple racecar apple", ["race", "car", "apple", "racecar"])
-    assert result == ["car apple race apple", "apple racecar apple"]
+    assert result == ["apple racecar apple", "apple race apple car"]
   end
 
   test "can find words with apostrophes, like 'I'm'" do
     result = BasicAnagramUser.anagrams_of("I'm cool", ["I'm", "cool", "mi"])
-    assert result == ["cool mi", "cool I'm"]
+    assert result == ["mi cool", "I'm cool"]
   end
 
   test "uses the built-in default dictionary if none is specified" do
@@ -35,7 +35,7 @@ defmodule AnagramTest do
 
   test "can find anagrams using the built-in default dictionary" do
     result = BasicAnagramUser.anagrams_of("onto")
-    assert result == ["onto", "no to", "on to", "ton o", "not o"]
+    assert result == ["to no", "to on", "o ton", "o not", "onto"]
   end
 
   test "can find anagrams using a dictionary defined in the user's module" do
@@ -45,7 +45,10 @@ defmodule AnagramTest do
 
   test "uses legal_codepoints as defined in the user's module" do
     result = CustomAnagramUser.anagrams_of("mañana", :tiny_spanish)
-    assert result == ["mañana", "ña mana", "maña na"]
+    assert result == ["ña mana", "na maña", "mañana"]
+    another_result = CustomAnagramUser.anagrams_of("maana", :tiny_spanish)
+    assert another_result != result
+    assert another_result == []
   end
 
   test "human_readable builds a 'cartesian join' of words the alphagrams can spell" do
@@ -58,4 +61,30 @@ defmodule AnagramTest do
       "car care", "car race"
     ])
   end
+
+  def ag(str), do: Anagram.Alphagram.to_alphagram(str)
+  def ags(list), do: Enum.map(list, &ag/1)
+
+  test "create_jobs makes jobs for the next level of the search tree" do
+    bag = ag("onto")
+    possible_words   = ags(["hi", "to", "on", "not"])
+    found  = ags([])
+    assert Anagram.create_jobs(bag, possible_words, found) == [
+      [ found: ags(["to"]), bag: ag("on"),  possible_words: ags(["to"])],
+      [ found: ags(["on" ]), bag: ag("to"), possible_words: ags(["on", "to"])],
+      [ found: ags(["not" ]), bag: ag("o"), possible_words: ags(["not", "on", "to"])],
+    ]
+  end
+
+  test "create_jobs adds to the list of found words" do
+    bag = ag("onto")
+    possible_words   = ags(["hi", "to", "on", "not"])
+    found  = ags(["boat"])
+    assert Anagram.create_jobs(bag, possible_words, found)  == [
+      [ found: ags(["to", "boat"]), bag: ag("on"),  possible_words: ags(["to"])],
+      [ found: ags(["on" , "boat"]), bag: ag("to"), possible_words: ags(["on", "to"])],
+      [ found: ags(["not" , "boat"]), bag: ag("o"), possible_words: ags(["not", "on", "to"])],
+    ]
+  end
+
 end

@@ -1,26 +1,42 @@
+require Anagram.Alphagram
 defmodule Anagram do
-  @default_wordlists Anagram.Dictionary.load_files(%{default: "#{Path.dirname(__ENV__.file)}/common_words_dictionary.txt"})
-  def default_wordlists do
-    @default_wordlists
+  def default_dict_file do
+    "#{Path.dirname(__ENV__.file)}/common_words_dictionary.txt"
   end
 
   defmacro __using__(_) do
     quote do
+
+      their_wordlists = Module.get_attribute(__MODULE__, :wordlists)
+      if their_wordlists == nil do
+        @wordlists Anagram.Dictionary.load_files(%{default: Anagram.default_dict_file})
+      else
+        @wordlists their_wordlists
+      end
+      their_legal_codepoints = Module.get_attribute(__MODULE__, :legal_codepoints)
+      if their_legal_codepoints == nil do
+        @legal_codepoints Anagram.Alphagram.default_legal_codepoints
+      else
+        @legal_codepoints their_legal_codepoints
+      end
+
+      @compiled_dictionaries (for {k, v} <- @wordlists, into: %{} do
+        {k, Anagram.Dictionary.to_dictionary(v, @legal_codepoints)}
+      end)
+      def dictionaries do
+        @compiled_dictionaries
+      end
 
       def anagrams_of(phrase) do
         anagrams_of(phrase, :default)
       end
 
       def anagrams_of(phrase, dictionary_name) when is_atom(dictionary_name) do
-        if :erlang.is_map(dictionaries) do
-          case Map.fetch(dictionaries, dictionary_name) do
-            :error ->
-              raise "Cannot find dictionary named #{inspect dictionary_name} in map returned from `dictionaries`"
-            {:ok, dictionary} ->
-              anagrams_of(phrase, dictionary)
-          end
-        else
-          raise "No map of dictionaries was returned from function dictionaries/0 - see documentation"
+        case Map.fetch(dictionaries, dictionary_name) do
+          :error ->
+            raise "Cannot find dictionary named #{inspect dictionary_name} in map returned from `dictionaries`"
+          {:ok, dictionary} ->
+            anagrams_of(phrase, dictionary)
         end
       end
 
@@ -28,27 +44,17 @@ defmodule Anagram do
       # phrase is a string
       # wordlist is a list of strings
       def anagrams_of(phrase, wordlist) when is_list(wordlist) do
-        dict          = Anagram.Dictionary.to_dictionary(wordlist, &legal_codepoint?/1)
-        possible_words  = Map.keys(dict) # TODO - make this ordered like input dict
-        initial_bag = Anagram.Alphagram.to_alphagram(phrase, &legal_codepoint?/1)
-        anagrams = Anagram.generate_anagrams(initial_bag, possible_words)
+        dict          = Anagram.Dictionary.to_dictionary(wordlist, @legal_codepoints)
+        anagrams_of(phrase, dict)
+      end
+
+      def anagrams_of(phrase, dict) do
+        possible_words  = Map.keys(dict) |> Enum.sort # for deterministic test output
+        initial_bag = Anagram.Alphagram.to_alphagram(phrase, @legal_codepoints)
+        # anagrams = Anagram.generate_anagrams(initial_bag, possible_words)
+        anagrams = Anagram.Queue.process([found: [], bag: initial_bag, possible_words: possible_words])
         anagrams |> Enum.map(&Anagram.human_readable(&1, dict)) |> List.flatten
       end
-
-      # TODO - find a way to process these with Anagram.Dictionary.to_dictionary at compile time
-      def dictionaries do
-        wordlists
-      end
-
-      def wordlists do
-        Anagram.default_wordlists
-      end
-
-      def legal_codepoint?(codepoint) do
-        Anagram.Alphagram.legal_codepoint?(codepoint)
-      end
-
-      defoverridable [wordlists: 0, legal_codepoint?: 1]
     end
 
   end
@@ -63,7 +69,7 @@ defmodule Anagram do
   # completely done moving right through the anagram tree
   def anagrams_for_words_and_bags({[], []}, acc), do: acc
 
-  def anagrams_for_words_and_bags({[word|words_t]=words, [bag|bags_t]=bags}, acc) do
+  def anagrams_for_words_and_bags({[word|words_t]=words, [bag|bags_t]=_bags}, acc) do
     newly_found_anagrams = case bag do
       [] -> 
         # found a leaf
@@ -76,6 +82,24 @@ defmodule Anagram do
 
     # keep moving right through the anagram tree
     anagrams_for_words_and_bags({words_t, bags_t}, newly_found_anagrams ++ acc)
+  end
+
+  def process_one_job([found: found, bag: [], possible_words: _]) do
+    {:anagram, found}
+  end
+  def process_one_job([found: found, bag: bag, possible_words: possible_words]) do
+    {:more_jobs, create_jobs(bag, possible_words, found)}
+  end
+
+  def create_jobs(bag, possible_words, found) do
+    {words, bags} = find_words(bag, possible_words)
+    jobs(words, bags, found, [])
+  end
+
+  def jobs([]=_words, []=_bags, _found, acc), do: acc
+  def jobs([word|words_t]=words, [bag|bags_t], found, acc) do
+    one_job = [ found: [word|found], bag: bag, possible_words: words ]
+    jobs(words_t, bags_t, found, [one_job|acc])
   end
 
   def find_words(bag, possible_words) do
