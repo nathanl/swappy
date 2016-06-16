@@ -1,10 +1,5 @@
 require Anagram.Alphagram
 defmodule Anagram do
-  # @default_wordlists 
-  # def default_wordlists do
-  #   @default_wordlists
-  # end
-  #        dict          = Anagram.Dictionary.to_dictionary(wordlist, &legal_codepoint?/1)
   def default_dict_file do
     "#{Path.dirname(__ENV__.file)}/common_words_dictionary.txt"
   end
@@ -31,11 +26,6 @@ defmodule Anagram do
       def dictionaries do
         @compiled_dictionaries
       end
-
-      IO.puts "TODO FIX THIS THX"
-      # if using_opts.wordlists is not the right format
-      #   raise "No map of dictionaries was returned from function dictionaries/0 - see documentation"
-      # end
 
       def anagrams_of(phrase) do
         anagrams_of(phrase, :default)
@@ -94,36 +84,12 @@ defmodule Anagram do
     anagrams_for_words_and_bags({words_t, bags_t}, newly_found_anagrams ++ acc)
   end
 
-  # TODO temp code to test create_jobs
-  # We could put an accumulator on process_queue to accumulate found anagrams.
-  # But we want to send them to some supervisor one at a time, right?
-  def process_queue([], _, anagram_count, _dictionary) do
-    IO.puts("All done with #{anagram_count} anagrams")
-  end
-  def process_queue([job|rest_of_jobs], n, anagram_count, dictionary) do
-    case process_one_job(job) do
-      {:anagram, found} -> 
-        count = emit_anagrams(found, dictionary, anagram_count)
-        process_queue(rest_of_jobs, n-1, anagram_count+count, dictionary)
-      {:more_jobs, new_jobs} -> 
-        process_queue(new_jobs ++ rest_of_jobs, n-1 + Enum.count(new_jobs), anagram_count, dictionary)
-    end
-  end
-
   def process_one_job([found: found, bag: [], possible_words: _]) do
     {:anagram, found}
   end
   def process_one_job([found: found, bag: bag, possible_words: possible_words]) do
     {:more_jobs, create_jobs(bag, possible_words, found)}
   end
-  def emit_anagrams(found, dictionary, _n) do
-    #TODO we already have a function that does this
-    #TODO we could 'send' this to a supervisor instead
-    anagrams = human_readable found, dictionary
-    #anagrams |> Enum.each(&(IO.puts "Anagram group #{n}: #{&1}"))
-    Enum.count anagrams
-  end
-  #TODO end temp code
 
   def create_jobs(bag, possible_words, found) do
     {words, bags} = find_words(bag, possible_words)

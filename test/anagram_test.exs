@@ -87,25 +87,4 @@ defmodule AnagramTest do
     ]
   end
 
-  # test "it works" do
-  #   IO.puts "Make"
-  #   dictionary = Anagram.Dictionary.load_file("~/code/anagram_wordlists/pruned_wordlist_by_length.txt") |> Anagram.Dictionary.to_dictionary
-  #   wordlist =  Map.keys dictionary
-  #   IO.puts "Made"
-  #   Anagram.process_queue(
-  #     [
-  #       [
-  #         found: [], bag: ag("racecars are rad me lad"), possible_words: wordlist
-  #       ]
-  #     ], 1, 0, dictionary
-  #   )
-  # end
-
-  # test "it can do all this crap in processes" do
-  #   bag = ag("onto")
-  #   possible_words   = ags(["hi", "to", "on", "not"])
-  #   job = [found: [], bag: bag, possible_words: possible_words]
-  #   result = Anagram.Queue.process(job)
-  #   assert result == ["on to"]
-  # end
 end
