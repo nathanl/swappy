@@ -1,12 +1,36 @@
+require Anagram.Alphagram
 defmodule Anagram do
-  @default_wordlists Anagram.Dictionary.load_files(%{default: "#{Path.dirname(__ENV__.file)}/common_words_dictionary.txt"})
-  def default_wordlists do
-    @default_wordlists
-  end
+  # @default_wordlists 
+  # def default_wordlists do
+  #   @default_wordlists
+  # end
   #        dict          = Anagram.Dictionary.to_dictionary(wordlist, &legal_codepoint?/1)
+  def default_dict_file do
+    "#{Path.dirname(__ENV__.file)}/common_words_dictionary.txt"
+  end
 
-  defmacro __using__(using_opts) do
+  defmacro __using__(_) do
     quote do
+
+      their_wordlists = Module.get_attribute(__MODULE__, :wordlists)
+      if their_wordlists == nil do
+        @wordlists Anagram.Dictionary.load_files(%{default: Anagram.default_dict_file})
+      else
+        @wordlists their_wordlists
+      end
+      their_legal_codepoints = Module.get_attribute(__MODULE__, :legal_codepoints)
+      if their_legal_codepoints == nil do
+        @legal_codepoints Anagram.Alphagram.default_legal_codepoints
+      else
+        @legal_codepoints their_legal_codepoints
+      end
+
+      @compiled_dictionaries (for {k, v} <- @wordlists, into: %{} do
+        {k, Anagram.Dictionary.to_dictionary(v, @legal_codepoints)}
+      end)
+      def dictionaries do
+        @compiled_dictionaries
+      end
 
       IO.puts "TODO FIX THIS THX"
       # if using_opts.wordlists is not the right format
@@ -30,38 +54,17 @@ defmodule Anagram do
       # phrase is a string
       # wordlist is a list of strings
       def anagrams_of(phrase, wordlist) when is_list(wordlist) do
-        dict          = Anagram.Dictionary.to_dictionary(wordlist, &legal_codepoint?/1)
+        dict          = Anagram.Dictionary.to_dictionary(wordlist, @legal_codepoints)
         anagrams_of(phrase, dict)
       end
 
       def anagrams_of(phrase, dict) do
         possible_words  = Map.keys(dict) |> Enum.sort # for deterministic test output
-        initial_bag = Anagram.Alphagram.to_alphagram(phrase, &legal_codepoint?/1)
+        initial_bag = Anagram.Alphagram.to_alphagram(phrase, @legal_codepoints)
         # anagrams = Anagram.generate_anagrams(initial_bag, possible_words)
         anagrams = Anagram.Queue.process([found: [], bag: initial_bag, possible_words: possible_words])
         anagrams |> Enum.map(&Anagram.human_readable(&1, dict)) |> List.flatten
       end
-
-      def legal_codepoint?(codepoint) do
-        # func = Keyword.get(unquote(using_opts), :legal_codepoint?, Anagram.Alphagram.legal_codepoint?/1)
-        # func(codepoint)
-        Anagram.Alphagram.legal_codepoint?(codepoint)
-      end
-
-      # def wordlists do
-      #   Keyword.get(unquote(using_opts), :wordlists, @default_wordlists)
-      # end
-      # @legal_codepoint_func Keyword.get(unquote(using_opts), :legal_codepoint?, Anagram.Alphagram.legal_codepoint?/1)
-
-      @compiled_dictionaries (for {k, v} <- Keyword.get(unquote(using_opts), :wordlists, Anagram.default_wordlists), into: %{} do
-        {k, Anagram.Dictionary.to_dictionary(v)}
-      end)
-      def dictionaries do
-        @compiled_dictionaries
-      end
-
-
-      defoverridable [legal_codepoint?: 1]
     end
 
   end

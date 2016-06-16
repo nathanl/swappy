@@ -21,7 +21,7 @@ defmodule AnagramTest do
 
   test "can handle duplicate words in the input phrase" do
     result = BasicAnagramUser.anagrams_of("apple racecar apple", ["race", "car", "apple", "racecar"])
-    assert result == ["apple race apple car", "apple racecar apple"]
+    assert result == ["apple racecar apple", "apple race apple car"]
   end
 
   test "can find words with apostrophes, like 'I'm'" do
@@ -45,10 +45,10 @@ defmodule AnagramTest do
 
   test "uses legal_codepoints as defined in the user's module" do
     result = CustomAnagramUser.anagrams_of("mañana", :tiny_spanish)
-    assert result == ["na maña", "mana ña", "mañana"]
-    IO.puts "TODO fix this along with CustomAnagramUser"
-    # another_result = CustomAnagramUser.anagrams_of("maana", :tiny_spanish)
-    # assert result != another_result
+    assert result == ["ña mana", "na maña", "mañana"]
+    another_result = CustomAnagramUser.anagrams_of("maana", :tiny_spanish)
+    assert another_result != result
+    assert another_result == []
   end
 
   test "human_readable builds a 'cartesian join' of words the alphagrams can spell" do
