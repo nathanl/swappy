@@ -3,6 +3,7 @@ defmodule Anagram do
   def default_wordlists do
     @default_wordlists
   end
+  #        dict          = Anagram.Dictionary.to_dictionary(wordlist, &legal_codepoint?/1)
 
   defmacro __using__(using_opts) do
     quote do
@@ -17,7 +18,7 @@ defmodule Anagram do
       end
 
       def anagrams_of(phrase, dictionary_name) when is_atom(dictionary_name) do
-        case Map.fetch(wordlists, dictionary_name) do
+        case Map.fetch(dictionaries, dictionary_name) do
           :error ->
             raise "Cannot find dictionary named #{inspect dictionary_name} in map returned from `dictionaries`"
           {:ok, dictionary} ->
@@ -41,13 +42,24 @@ defmodule Anagram do
         anagrams |> Enum.map(&Anagram.human_readable(&1, dict)) |> List.flatten
       end
 
-      def wordlists do
-        Keyword.get(unquote(using_opts), :wordlists, Anagram.default_wordlists)
-      end
-
       def legal_codepoint?(codepoint) do
+        # func = Keyword.get(unquote(using_opts), :legal_codepoint?, Anagram.Alphagram.legal_codepoint?/1)
+        # func(codepoint)
         Anagram.Alphagram.legal_codepoint?(codepoint)
       end
+
+      # def wordlists do
+      #   Keyword.get(unquote(using_opts), :wordlists, @default_wordlists)
+      # end
+      # @legal_codepoint_func Keyword.get(unquote(using_opts), :legal_codepoint?, Anagram.Alphagram.legal_codepoint?/1)
+
+      @compiled_dictionaries (for {k, v} <- Keyword.get(unquote(using_opts), :wordlists, Anagram.default_wordlists), into: %{} do
+        {k, Anagram.Dictionary.to_dictionary(v)}
+      end)
+      def dictionaries do
+        @compiled_dictionaries
+      end
+
 
       defoverridable [legal_codepoint?: 1]
     end
