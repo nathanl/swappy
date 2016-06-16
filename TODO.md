@@ -1,0 +1,7 @@
+- Maybe change alphagrams to charlists - would make 'abc' in tests nice and maybe integers are more efficient to pass
+- Queue - separate manager and worker modules
+- Allow configuring number of workers in queue via env variables
+- Mo documentation
+- Doctests?
+- PROPERTY TESTS!?!?!
+- crazy idea: sigil for alphagrams, which ensures sorted charlist
