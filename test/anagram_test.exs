@@ -46,6 +46,9 @@ defmodule AnagramTest do
   test "uses legal_codepoints as defined in the user's module" do
     result = CustomAnagramUser.anagrams_of("mañana", :tiny_spanish)
     assert result == ["na maña", "mana ña", "mañana"]
+    IO.puts "TODO fix this along with CustomAnagramUser"
+    # another_result = CustomAnagramUser.anagrams_of("maana", :tiny_spanish)
+    # assert result != another_result
   end
 
   test "human_readable builds a 'cartesian join' of words the alphagrams can spell" do
