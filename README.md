@@ -1,9 +1,9 @@
-# Anagrams
+# Swappy
 
 Elixir anagram generator. Basic usage:
 
     defmodule MyAnagramGenerator do
-      use Anagram
+      use Swappy
     end
 
     anagrams = MyAnagramGenerator.anagrams_of(some_string) # uses a default wordlist
@@ -20,9 +20,9 @@ Your wordlist has to undergo some processing before it can be used to build anag
 
 You can do that as follows:
 
-    defmodule AnagramUser do
-      use Anagram
-      @wordlists Anagram.Dictionary.load_files(
+    defmodule SwappyUser do
+      use Swappy
+      @wordlists Swappy.Dictionary.load_files(
         %{
           default:   "/path/to/some_dictionary",
           alternate: "~/path/to/other_dictionary"

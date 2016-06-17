@@ -1,4 +1,4 @@
-defmodule Anagram.Mixfile do
+defmodule Swappy.Mixfile do
   use Mix.Project
 
   def project do

@@ -1,10 +1,10 @@
-defmodule Anagram.Queue do
+defmodule Swappy.Queue do
   # This strategy is "go until everything is done". Other possible strategies to implement later
   #  - go until enough, then drop everything else on the floor
   #  - go until enough, wait for remaining workers, return answers and partials so we can continue later
 
   def process(job) do
-    Anagram.Queue.Manager.start(self, job)
+    Swappy.Queue.Manager.start(self, job)
     receive do
       {:results, raw_anagrams} -> raw_anagrams
     end
@@ -21,7 +21,7 @@ defmodule Anagram.Queue do
     end
 
     defp spawn_workers do
-      1..@max_workers |> Enum.map(fn _ -> spawn_link &(Anagram.Queue.Worker.work/0) end)
+      1..@max_workers |> Enum.map(fn _ -> spawn_link &(Swappy.Queue.Worker.work/0) end)
     end
 
     # all done, yaaaay!
@@ -63,7 +63,7 @@ defmodule Anagram.Queue do
       {found_anagrams, jobs}
     end
     defp do_work([job|jobs_t], found_anagrams, completed_jobs) do
-      case Anagram.process_one_job(job) do
+      case Swappy.process_one_job(job) do
         {:anagram, anagram} ->
           do_work(jobs_t, [anagram|found_anagrams], completed_jobs+1)
         {:more_jobs, jobs} ->

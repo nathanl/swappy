@@ -1,9 +1,9 @@
-defmodule Anagram.DictionaryTest do
+defmodule Swappy.DictionaryTest do
   use ExUnit.Case
-  doctest Anagram
+  doctest Swappy
 
   test "can map dictionary words by character list" do
-    actual = Anagram.Dictionary.to_dictionary(["bat", "tab", "hat"])
+    actual = Swappy.Dictionary.to_dictionary(["bat", "tab", "hat"])
     expected = %{
       'abt' => ["tab", "bat"],
       'aht' => ["hat"],

@@ -1,4 +1,4 @@
-defmodule Anagram.Alphagram do
+defmodule Swappy.Alphagram do
 
   @default_legal_codepoints 'abcdefghijklmnopqrstuvwxyz'
   def default_legal_codepoints do

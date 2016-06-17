@@ -2,8 +2,8 @@ defmodule Mix.Tasks.Performance do
   use Mix.Task
 
   defmodule PerfModule do
-    @wordlists %{default: Anagram.Dictionary.load_file("lib/common_words_dictionary.txt")}
-    use Anagram, wordlists: @wordlists
+    @wordlists %{default: Swappy.Dictionary.load_file("lib/common_words_dictionary.txt")}
+    use Swappy, wordlists: @wordlists
   end
 
   def timey_time_time_time do
