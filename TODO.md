@@ -1,5 +1,6 @@
-- Allow configuring number of workers in queue via env variables
 - Mo documentation
 - Doctests?
+- Implement "stop after finding N anagrams"
+- Implement "and also, the anagrams you produce should be ordered like the dictionary I gave you." Eg, if "fart" is the first word in the dictionary, find all anagrams with "fart" before moving on. This will give users lots of ability to make the sort of anagrams they find funny or interesting. The simplest strategy would be to just sort their wordlist with biggest words up front, to make "most impressive" anagrams.
 - PROPERTY TESTS!?!?!
 - crazy idea: sigil for alphagrams, which ensures sorted charlist
