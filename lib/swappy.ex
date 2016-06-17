@@ -4,13 +4,7 @@ defmodule Swappy do
     quote do
 
       @wordlists Swappy.Dictionary.add_wordlists(Module.get_attribute(__MODULE__, :wordlists))
-
-      their_legal_chars = Module.get_attribute(__MODULE__, :legal_chars)
-      if their_legal_chars == nil do
-        @legal_chars Swappy.Alphagram.default_legal_chars
-      else
-        @legal_chars their_legal_chars
-      end
+      @legal_chars Swappy.Alphagram.set_legal_chars(Module.get_attribute(__MODULE__, :legal_chars))
 
       @compiled_dictionaries (for {k, v} <- @wordlists, into: %{} do
         {k, Swappy.Dictionary.to_dictionary(v, @legal_chars)}

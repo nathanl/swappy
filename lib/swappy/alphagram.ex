@@ -5,6 +5,14 @@ defmodule Swappy.Alphagram do
     @default_legal_chars
   end
 
+  def set_legal_chars(user_legal_chars) do
+    if is_list(user_legal_chars) do
+      user_legal_chars
+    else
+      Swappy.Alphagram.default_legal_chars
+    end
+  end
+
   # Convenience for to_alphagram/2; uses default list
   def to_alphagram(string) do
     to_alphagram(string, default_legal_chars)
