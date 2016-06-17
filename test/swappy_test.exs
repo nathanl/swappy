@@ -41,6 +41,8 @@ defmodule SwappyTest do
   test "can find anagrams using a dictionary defined in the user's module" do
     result = AdvancedSwappyUser.anagrams_of("spear", :tiny)
     assert result == ["spear", "spare", "reaps", "pears", "parse", "pares"]
+    result = AdvancedSwappyUser.anagrams_of("food", :foody)
+    assert result == ["of do", "doof", "food"]
   end
 
   test "uses legal_codepoints as defined in the user's module" do
