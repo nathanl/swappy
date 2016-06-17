@@ -53,16 +53,6 @@ See `Mix.Tasks.CleanUpEnglishDictionary` for an opinionated filter, then make yo
 
 TODO - explain
 
-## TODO
-
-- http://stackoverflow.com/questions/37601658/how-can-i-get-my-library-code-to-recompile-if-the-application-environment-change
-- Stop having Anagrams.Dictionary prune the incoming words
-- Ensure that if the dictionary file changes, it triggers a recompile
-- Cleanup and documentation
-- Release
-- Make parallelization less hacky.
-  - Idea: each phrase/dictionary lookup becomes a job in a queue, with jobs farmed out to N workers, who can send back "partially digested" jobs for reassignment or complete jobs to be added to results. When no jobs remain and no workers are still working, results are complete. This is way more complicated than what we're doing now, and we're probably already getting as much speedup from parallelization as we can get, given that we have more processes than cores on a typical machine and the work is CPU-bound, so it may not be worthwhile.
-
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
