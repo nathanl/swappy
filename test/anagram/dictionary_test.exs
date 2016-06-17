@@ -5,8 +5,8 @@ defmodule Anagram.DictionaryTest do
   test "can map dictionary words by character list" do
     actual = Anagram.Dictionary.to_dictionary(["bat", "tab", "hat"])
     expected = %{
-      [:a, :b, :t] => ["tab", "bat"],
-      [:a, :h, :t] => ["hat"],
+      'abt' => ["tab", "bat"],
+      'aht' => ["hat"],
     }
     assert actual == expected
   end
