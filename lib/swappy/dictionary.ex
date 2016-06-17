@@ -17,13 +17,6 @@ defmodule Swappy.Dictionary do
     end)
   end
 
-  # Transform a map of dictionary names and filenames into one of dictionary names and lists of words
-  def load_files(map) do
-    for {k, v} <- map, into: %{} do
-      {k, load_file(v)}
-    end
-  end
-
   # Takes a filename, returns list with one string per non-empty line
   def load_file(filename) do
     filename
@@ -31,4 +24,22 @@ defmodule Swappy.Dictionary do
     |> File.stream!
     |> Enum.map(&String.strip/1)
   end
+
+  # Merges the user's map of wordlists with Swappy defaults and loads files as necessary
+  def add_wordlists(user_wordlists) do
+    wordlists = Map.merge(default_wordlists, (user_wordlists || %{}))
+    for {wordlist_name, wordlist} <- wordlists, into: %{} do
+      loaded_wordlist = if is_binary(wordlist) do
+        load_file(wordlist)
+      else
+        wordlist
+      end
+      {wordlist_name, loaded_wordlist}
+    end
+  end
+
+  defp default_wordlists do
+    %{default: "#{Path.dirname(__ENV__.file)}/../default_wordlist.txt"}
+  end
+
 end

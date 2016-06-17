@@ -1,18 +1,10 @@
 require Swappy.Alphagram
 defmodule Swappy do
-  def default_dict_file do
-    "#{Path.dirname(__ENV__.file)}/default_wordlist.txt"
-  end
-
   defmacro __using__(_) do
     quote do
 
-      their_wordlists = Module.get_attribute(__MODULE__, :wordlists)
-      if their_wordlists == nil do
-        @wordlists Swappy.Dictionary.load_files(%{default: Swappy.default_dict_file})
-      else
-        @wordlists their_wordlists
-      end
+      @wordlists Swappy.Dictionary.add_wordlists(Module.get_attribute(__MODULE__, :wordlists))
+
       their_legal_chars = Module.get_attribute(__MODULE__, :legal_chars)
       if their_legal_chars == nil do
         @legal_chars Swappy.Alphagram.default_legal_chars

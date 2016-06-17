@@ -38,11 +38,13 @@ defmodule SwappyTest do
     assert result == ["to no", "to on", "o ton", "o not", "onto"]
   end
 
-  test "can find anagrams using a dictionary defined in the user's module" do
+  test "can find anagrams using a dictionary defined in the user's module or the default" do
     result = AdvancedSwappyUser.anagrams_of("spear", :tiny)
     assert result == ["spear", "spare", "reaps", "pears", "parse", "pares"]
     result = AdvancedSwappyUser.anagrams_of("food", :foody)
     assert result == ["of do", "doof", "food"]
+    result = AdvancedSwappyUser.anagrams_of("onto")
+    assert result == ["to no", "to on", "o ton", "o not", "onto"]
   end
 
   test "uses legal_chars as defined in the user's module" do
