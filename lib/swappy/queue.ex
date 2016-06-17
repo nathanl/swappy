@@ -11,8 +11,9 @@ defmodule Swappy.Queue do
   end
 
   defmodule Manager do
-   # You would think more would be faster, but you'd be wrong. I don't know why, really.
-    @max_workers 4
+   # You would think "as many workers as I have cores" would be optimal, but in my testing, it's fewer than that.
+   # I'm not sure why.
+    @worker_count Application.get_env(:swappy, :worker_count)
 
     def start(spawner_pid, first_job) do
       spawn_link fn ->
@@ -21,11 +22,11 @@ defmodule Swappy.Queue do
     end
 
     defp spawn_workers do
-      1..@max_workers |> Enum.map(fn _ -> spawn_link &(Swappy.Queue.Worker.work/0) end)
+      1..@worker_count |> Enum.map(fn _ -> spawn_link &(Swappy.Queue.Worker.work/0) end)
     end
 
     # all done, yaaaay!
-    defp manage_queue(spawner_pid, results, []=_jobs, idle_workers) when length(idle_workers) == @max_workers do
+    defp manage_queue(spawner_pid, results, []=_jobs, idle_workers) when length(idle_workers) == @worker_count do
       send(spawner_pid, {:results, results})
     end
 

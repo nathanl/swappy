@@ -2,7 +2,7 @@ defmodule Swappy.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :anagrams,
+    [app: :swappy,
      version: "0.0.1",
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
@@ -23,7 +23,12 @@ defmodule Swappy.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [
+      applications: [:logger],
+      env: [
+        worker_count: 4,
+      ],
+    ]
   end
 
   # Dependencies can be Hex packages:
