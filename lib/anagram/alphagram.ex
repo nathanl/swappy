@@ -1,6 +1,6 @@
 defmodule Anagram.Alphagram do
 
-  @default_legal_codepoints "abcdefghijklmnopqrstuvwxyz" |> String.codepoints
+  @default_legal_codepoints 'abcdefghijklmnopqrstuvwxyz'
   def default_legal_codepoints do
     @default_legal_codepoints
   end
@@ -11,14 +11,13 @@ defmodule Anagram.Alphagram do
   end
 
   # Sorted, non-unique list of codepoints
-  # "alpha" -> ["a", "a", "h", "l", "p"]
+  # "alpha" -> 'aahlp'
   def to_alphagram(string, legal_codepoints) do
     string
     |> String.downcase
-    |> String.codepoints
+    |> String.to_char_list
     |> Enum.filter(&(&1 in legal_codepoints))
     |> Enum.sort
-    |> Enum.map(&String.to_atom/1)
   end
 
   # *** This function relies on knowledge that alphagrams are sorted ***

@@ -2,7 +2,7 @@ defmodule Mix.Tasks.Performance do
   use Mix.Task
 
   defmodule PerfModule do
-    @wordlists %{default: Anagram.Dictionary.load_file("~/code/anagram_wordlists/pruned_wordlist_by_length.txt")}
+    @wordlists %{default: Anagram.Dictionary.load_file("lib/common_words_dictionary.txt")}
     use Anagram, wordlists: @wordlists
   end
 
