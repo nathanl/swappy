@@ -1,4 +1,3 @@
-- Queue - separate manager and worker modules
 - Allow configuring number of workers in queue via env variables
 - Mo documentation
 - Doctests?
