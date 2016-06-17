@@ -1,13 +1,22 @@
 defmodule Swappy.Mixfile do
   use Mix.Project
 
+  @version "0.0.1"
+
   def project do
     [app: :swappy,
-     version: "0.0.1",
+     version: @version,
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      description: "An anagram generator",
+     package: package,
+     docs: [
+       extras: ["README.md"],
+       main: "readme",
+       source_ref: "v#{@version}",
+       source_url: "https://github.com/nathanl/swappy"
+     ],
      deps: deps]
   end
 
@@ -15,7 +24,7 @@ defmodule Swappy.Mixfile do
     [
       maintainers: ["Nathan Long"],
       licenses: ["MIT"],
-      links: %{"Github" => "https://github.com/nathanl/elixir-anagrams"}
+      links: %{"Github" => "https://github.com/nathanl/swappy"}
     ]
   end
 
