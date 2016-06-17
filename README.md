@@ -8,25 +8,31 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
   1. Add swappy to your list of dependencies in `mix.exs`:
 
-        def deps do
-          [{:swappy, "~> 0.0.1"}]
-        end
+```elixir
+def deps do
+  [{:swappy, "~> 0.0.1"}]
+end
+```
 
   2. Ensure swappy is started before your application:
 
-        def application do
-          [applications: [:swappy]]
-        end
+```elixir
+def application do
+  [applications: [:swappy]]
+end
+```
 
 ## Basic Usage
 
-    defmodule MyAnagramGenerator do
-      use Swappy
-    end
+```elixir
+defmodule MyAnagramGenerator do
+  use Swappy
+end
 
-    anagrams = MyAnagramGenerator.anagrams_of(some_string) # uses a default wordlist
-    # or
-    anagrams = MyAnagramGenerator.anagrams_of(some_string, some_wordlist)
+anagrams = MyAnagramGenerator.anagrams_of(some_string) # uses a default wordlist
+# or
+anagrams = MyAnagramGenerator.anagrams_of(some_string, some_wordlist)
+```
 
 `some_wordlist` should be a list of words you consider valid. This is fine for playing around in the console, but since your wordlist requires some processing before Swappy can use it to generate anagrams, you'll get better performance if you let Swappy do that at compilation time.
 
@@ -38,15 +44,17 @@ The keys of your map will be the names of the wordlists, and the values can be l
 
 You can do that as follows:
 
-    defmodule SwappyUser do
-      @wordlists %{
-        tiny: ["pares", "parse", "pears", "reaps", "spare", "spear"],
-        tiny_spanish: ["mañana", "maña", "na", "mana", "ña"],
-        foody: "test/foody_wordlist.txt"
-      }
+```elixir
+defmodule SwappyUser do
+  @wordlists %{
+    tiny: ["pares", "parse", "pears", "reaps", "spare", "spear"],
+    tiny_spanish: ["mañana", "maña", "na", "mana", "ña"],
+    foody: "test/foody_wordlist.txt"
+  }
 
-      use Swappy
-    end
+  use Swappy
+end
+```
 
 You can pass the name of the wordlist to use when generating anagrams: `SwappyUser.anagrams_of("pares", :tiny)`. If no wordlist name is given, `:default` is assumed. If your map includes a `:default`, it will take the place of the one included with Swappy.
 
@@ -58,11 +66,13 @@ For instance, the default list of legal characters is just `a` through `z`, whic
 
 You can customize the list of legal characters by setting `@legal_chars` in your module to be a charlist before you `use Swappy`. For instance:
 
-    defmodule SwappyUser do
-      @legal_chars 'abcdefghijklmnopqrstuvwxyz' ++ 'áéíóúüñ'
+```elixir
+defmodule SwappyUser do
+  @legal_chars 'abcdefghijklmnopqrstuvwxyz' ++ 'áéíóúüñ'
 
-      use Swappy
-    end
+  use Swappy
+end
+```
 
 ## About the Wordlist
 
@@ -82,7 +92,9 @@ See `Mix.Tasks.CleanUpEnglishDictionary` for an opinionated filter, then make yo
 
 You can control the number of processes that Swappy uses to search for anagrams by setting an variable in your environment config. You can tweak this number and try running `mix performance` to see how it changes.
 
-    config :swappy, worker_count: 4
+```elixir
+config :swappy, worker_count: 4
+```
 
 ## Development
 
