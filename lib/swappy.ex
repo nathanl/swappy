@@ -1,7 +1,7 @@
 require Swappy.Alphagram
 defmodule Swappy do
   def default_dict_file do
-    "#{Path.dirname(__ENV__.file)}/common_words_dictionary.txt"
+    "#{Path.dirname(__ENV__.file)}/default_wordlist.txt"
   end
 
   defmacro __using__(_) do

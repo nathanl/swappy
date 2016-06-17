@@ -2,7 +2,7 @@ defmodule Mix.Tasks.Performance do
   use Mix.Task
 
   defmodule PerfModule do
-    @wordlists %{default: Swappy.Dictionary.load_file("lib/common_words_dictionary.txt")}
+    @wordlists %{default: Swappy.Dictionary.load_file("lib/default_wordlist.txt")}
     use Swappy, wordlists: @wordlists
   end
 
