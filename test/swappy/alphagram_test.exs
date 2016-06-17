@@ -6,12 +6,12 @@ defmodule Swappy.AlphagramTest do
     assert Swappy.Alphagram.to_alphagram("nappy") == 'anppy'
   end
 
-  test "converting a string to an alphagram and removing illegal codepoints" do
-    # Assumes default legal codepoints
+  test "converting a string to an alphagram and removing illegal chars" do
+    # Assumes default legal chars
     assert Swappy.Alphagram.to_alphagram("nappy?!!") == 'anppy'
 
-    legal_codepoints  = 'bcdefghijklmnopqrstuvwxyz'
-    assert Swappy.Alphagram.to_alphagram("nappy?!!", legal_codepoints) == 'nppy'
+    legal_chars  = 'bcdefghijklmnopqrstuvwxyz'
+    assert Swappy.Alphagram.to_alphagram("nappy?!!", legal_chars) == 'nppy'
 
     assert Swappy.Alphagram.to_alphagram("nappy?!!", 'ap') == 'app'
   end

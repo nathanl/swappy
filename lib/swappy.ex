@@ -13,15 +13,15 @@ defmodule Swappy do
       else
         @wordlists their_wordlists
       end
-      their_legal_codepoints = Module.get_attribute(__MODULE__, :legal_codepoints)
-      if their_legal_codepoints == nil do
-        @legal_codepoints Swappy.Alphagram.default_legal_codepoints
+      their_legal_chars = Module.get_attribute(__MODULE__, :legal_chars)
+      if their_legal_chars == nil do
+        @legal_chars Swappy.Alphagram.default_legal_chars
       else
-        @legal_codepoints their_legal_codepoints
+        @legal_chars their_legal_chars
       end
 
       @compiled_dictionaries (for {k, v} <- @wordlists, into: %{} do
-        {k, Swappy.Dictionary.to_dictionary(v, @legal_codepoints)}
+        {k, Swappy.Dictionary.to_dictionary(v, @legal_chars)}
       end)
       def dictionaries do
         @compiled_dictionaries
@@ -44,13 +44,13 @@ defmodule Swappy do
       # phrase is a string
       # wordlist is a list of strings
       def anagrams_of(phrase, wordlist) when is_list(wordlist) do
-        dict          = Swappy.Dictionary.to_dictionary(wordlist, @legal_codepoints)
+        dict          = Swappy.Dictionary.to_dictionary(wordlist, @legal_chars)
         anagrams_of(phrase, dict)
       end
 
       def anagrams_of(phrase, dict) do
         possible_words  = Map.keys(dict) |> Enum.sort # for deterministic test output
-        initial_bag = Swappy.Alphagram.to_alphagram(phrase, @legal_codepoints)
+        initial_bag = Swappy.Alphagram.to_alphagram(phrase, @legal_chars)
         # anagrams = Swappy.generate_anagrams(initial_bag, possible_words)
         anagrams = Swappy.Queue.process([found: [], bag: initial_bag, possible_words: possible_words])
         anagrams |> Enum.map(&Swappy.human_readable(&1, dict)) |> List.flatten

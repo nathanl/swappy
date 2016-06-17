@@ -1,6 +1,6 @@
 defmodule AdvancedSwappyUser do
 
-  @legal_codepoints 'abcdefghijklmnopqrstuvwxyz' ++ 'áéíóúüñ'
+  @legal_chars 'abcdefghijklmnopqrstuvwxyz' ++ 'áéíóúüñ'
   @inline_wordlists %{
     tiny: ["pares", "parse", "pears", "reaps", "spare", "spear"],
     tiny_spanish: ["mañana", "maña", "na", "mana", "ña"],

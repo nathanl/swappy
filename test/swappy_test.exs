@@ -45,7 +45,7 @@ defmodule SwappyTest do
     assert result == ["of do", "doof", "food"]
   end
 
-  test "uses legal_codepoints as defined in the user's module" do
+  test "uses legal_chars as defined in the user's module" do
     result = AdvancedSwappyUser.anagrams_of("mañana", :tiny_spanish)
     assert result == ["ña mana", "na maña", "mañana"]
     another_result = AdvancedSwappyUser.anagrams_of("maana", :tiny_spanish)

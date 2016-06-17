@@ -1,22 +1,22 @@
 defmodule Swappy.Alphagram do
 
-  @default_legal_codepoints 'abcdefghijklmnopqrstuvwxyz'
-  def default_legal_codepoints do
-    @default_legal_codepoints
+  @default_legal_chars 'abcdefghijklmnopqrstuvwxyz'
+  def default_legal_chars do
+    @default_legal_chars
   end
 
   # Convenience for to_alphagram/2; uses default list
   def to_alphagram(string) do
-    to_alphagram(string, default_legal_codepoints)
+    to_alphagram(string, default_legal_chars)
   end
 
-  # Sorted, non-unique list of codepoints
+  # Sorted, non-unique list of chars
   # "alpha" -> 'aahlp'
-  def to_alphagram(string, legal_codepoints) do
+  def to_alphagram(string, legal_chars) do
     string
     |> String.downcase
     |> String.to_char_list
-    |> Enum.filter(&(&1 in legal_codepoints))
+    |> Enum.filter(&(&1 in legal_chars))
     |> Enum.sort
   end
 

@@ -1,18 +1,18 @@
 defmodule Swappy.Dictionary do
 
   def to_dictionary(wordlist) do
-    to_dictionary(wordlist, Swappy.Alphagram.default_legal_codepoints)
+    to_dictionary(wordlist, Swappy.Alphagram.default_legal_chars)
   end
 
   # returns map with entries like ["d", "g", "o"] => ["god", "dog"]
-  def to_dictionary(wordlist, legal_codepoints) do
+  def to_dictionary(wordlist, legal_chars) do
     Enum.reduce(wordlist, %{}, fn word, map_acc ->
       word = String.strip(word)
       if word == "" do
         map_acc
       else
         # If key isn't found, the value passed to our function is 'nil'
-        update_in(map_acc, [Swappy.Alphagram.to_alphagram(word, legal_codepoints)], &([word|(&1 || [])]))
+        update_in(map_acc, [Swappy.Alphagram.to_alphagram(word, legal_chars)], &([word|(&1 || [])]))
       end
     end)
   end
