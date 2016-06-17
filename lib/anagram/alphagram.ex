@@ -20,6 +20,10 @@ defmodule Anagram.Alphagram do
     |> Enum.sort
   end
 
+  def to_string(alphagram) do
+    String.Chars.to_string(alphagram)
+  end
+
   # *** This function relies on knowledge that alphagrams are sorted ***
   def without(outer, inner) do
     case without(outer, inner, []) do

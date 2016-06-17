@@ -19,10 +19,11 @@ defmodule Mix.Tasks.GenerateAnagrams do
   end
 
   def run([phrase, without]) do
+    # TODO - detect closed pipe and stop gracefully? Eg if piping to head
     alphagrams = [phrase, without] |> Enum.map(&Anagram.Alphagram.to_alphagram/1)
     case apply(Anagram.Alphagram, :without, alphagrams) do
       {:ok, remaining_alphagram, _without} ->
-        remaining_phrase = Enum.join(remaining_alphagram, "")
+        remaining_phrase = Anagram.Alphagram.to_string(remaining_alphagram)
         IO.puts ~s(phrase "#{remaining_phrase}" \("#{phrase}" without "#{without}"\) has anagrams:)
         anagrams_of(remaining_phrase) |> Enum.each(&(IO.puts(&1)))
     end
