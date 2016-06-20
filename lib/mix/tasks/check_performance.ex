@@ -6,17 +6,12 @@ defmodule Mix.Tasks.Performance do
     use Swappy, wordlists: @wordlists
   end
 
-  def timey_time_time_time do
-    {_, secs, micros} = :os.timestamp
-    secs*1_000_000 + micros
-  end
-
   def run(_args) do
     IO.puts "STARTING"
-    start = timey_time_time_time
+    start = Swappy.Timey.micros
     results = PerfModule.anagrams_of("racecars are rad me lad")
-    the_end = timey_time_time_time
-    IO.puts "anagram generation took #{the_end - start}"
+    the_end = Swappy.Timey.micros
+    IO.puts "anagram generation took #{Swappy.Timey.format(the_end - start)}"
     IO.puts "result count: #{Enum.count(results)}"
     IO.inspect results
     output = results |> Enum.map(fn (result) -> [result, "\n"] end)
