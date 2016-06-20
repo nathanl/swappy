@@ -87,9 +87,13 @@ defmodule Swappy do
     anagrams_for_words_and_bags({words_t, bags_t}, newly_found_anagrams ++ acc)
   end
 
+  # There are no more letters left in the bag, so "process" this job by simply
+  # declaring whatever has been found to be an anagram
   def process_one_job([found: found, bag: [], possible_words: _]) do
     {:anagram, found}
   end
+  # Since there are letters left in the bag, we should try some more ways of
+  # finding words
   def process_one_job([found: found, bag: bag, possible_words: possible_words]) do
     {:more_jobs, create_jobs(bag, possible_words, found)}
   end
@@ -105,6 +109,10 @@ defmodule Swappy do
     jobs(words_t, bags_t, found, [one_job|acc])
   end
 
+  # For every remaining possible word...
+  # - if it can't be spelled using the letters left in the bag, discard it
+  # - if it can be, add it to the words we've found, and add a bag that is the
+  # old bag minus this word's letters
   def find_words(bag, possible_words) do
     possible_words
     |> Enum.reduce({[], []}, fn (possible_word, {words, bags}) ->
