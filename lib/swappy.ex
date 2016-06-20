@@ -12,9 +12,10 @@ defmodule Swappy do
       def dictionaries do
         @compiled_dictionaries
       end
+      @default_options %{wordlist: :default, dictionary: nil, limit: :infinity}
 
       def anagrams_of(phrase) do
-        anagrams_of(phrase, %{wordlist: :default})
+        anagrams_of(phrase, @default_options)
       end
 
       def anagrams_of(phrase, %{wordlist: wordlist_name}=options) when is_atom(wordlist_name) do
@@ -52,6 +53,10 @@ defmodule Swappy do
         else
           anagrams
         end
+      end
+
+      def anagrams_of(phrase, options) do
+        anagrams_of(phrase, Map.merge(@default_options, options))
       end
     end
 

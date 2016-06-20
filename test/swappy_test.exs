@@ -93,9 +93,13 @@ defmodule SwappyTest do
 
   test "can stop early if given a limit" do
     phrase = "a longish phrase here, no matter what"
-    # TODO do not specify the wordlist here
-    results = BasicSwappyUser.anagrams_of(phrase, %{wordlist: :default, limit: 1})
+    results = BasicSwappyUser.anagrams_of(phrase, %{limit: 1})
     assert length(results) == 1
+  end
+
+  test "assumes default dictionary even if other options given" do
+    phrase = "onto"
+    assert BasicSwappyUser.anagrams_of(phrase, %{limit: 1}) == BasicSwappyUser.anagrams_of(phrase, %{wordlist: :default, limit: 1})
   end
 
 end
