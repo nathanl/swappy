@@ -8,7 +8,7 @@ defmodule Mix.Tasks.Performance do
 
   def timey_time_time_time do
     {_, secs, micros} = :os.timestamp
-    secs*1000000 + micros
+    secs*1_000_000 + micros
   end
 
   def run(_args) do
