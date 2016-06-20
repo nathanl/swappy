@@ -5,32 +5,32 @@ defmodule SwappyTest do
   doctest Swappy
 
   test "can find the only possible anagrams using a tiny dictionary" do
-    result = BasicSwappyUser.anagrams_of("onto", ["on", "to"])
+    result = BasicSwappyUser.anagrams_of("onto", %{wordlist: ["on", "to"]})
     assert result == ["to on"]
   end
 
   test "ignores punctuation, capitalization and spaces" do
-    result = BasicSwappyUser.anagrams_of("On, To!", ["on", "to"])
+    result = BasicSwappyUser.anagrams_of("On, To!", %{wordlist: ["on", "to"]})
     assert result == ["to on"]
   end
 
   test "can find human-readable anagrams of a phrase using a dictionary" do
-    result = BasicSwappyUser.anagrams_of("racecar", ["arc", "are", "car", "care", "race"])
+    result = BasicSwappyUser.anagrams_of("racecar", %{wordlist: ["arc", "are", "car", "care", "race"]})
     assert result == ["car race", "car care", "arc race", "arc care"]
   end
 
   test "can handle duplicate words in the input phrase" do
-    result = BasicSwappyUser.anagrams_of("apple racecar apple", ["race", "car", "apple", "racecar"])
+    result = BasicSwappyUser.anagrams_of("apple racecar apple", %{wordlist: ["race", "car", "apple", "racecar"]})
     assert result == ["apple racecar apple", "apple race apple car"]
   end
 
   test "can find words with apostrophes, like 'I'm'" do
-    result = BasicSwappyUser.anagrams_of("I'm cool", ["I'm", "cool", "mi"])
+    result = BasicSwappyUser.anagrams_of("I'm cool", %{wordlist: ["I'm", "cool", "mi"]})
     assert result == ["mi cool", "I'm cool"]
   end
 
   test "uses the built-in default dictionary if none is specified" do
-    assert BasicSwappyUser.anagrams_of("onto") == BasicSwappyUser.anagrams_of("onto", :default)
+    assert BasicSwappyUser.anagrams_of("onto") == BasicSwappyUser.anagrams_of("onto", %{wordlist: :default})
   end
 
   test "can find anagrams using the built-in default dictionary" do
@@ -39,18 +39,18 @@ defmodule SwappyTest do
   end
 
   test "can find anagrams using a dictionary defined in the user's module or the default" do
-    result = AdvancedSwappyUser.anagrams_of("spear", :tiny)
+    result = AdvancedSwappyUser.anagrams_of("spear", %{wordlist: :tiny})
     assert result == ["spear", "spare", "reaps", "pears", "parse", "pares"]
-    result = AdvancedSwappyUser.anagrams_of("food", :foody)
+    result = AdvancedSwappyUser.anagrams_of("food", %{wordlist: :foody})
     assert result == ["of do", "doof", "food"]
     result = AdvancedSwappyUser.anagrams_of("onto")
     assert result == ["to no", "to on", "o ton", "o not", "onto"]
   end
 
   test "uses legal_chars as defined in the user's module" do
-    result = AdvancedSwappyUser.anagrams_of("mañana", :tiny_spanish)
+    result = AdvancedSwappyUser.anagrams_of("mañana", %{wordlist: :tiny_spanish})
     assert result == ["ña mana", "na maña", "mañana"]
-    another_result = AdvancedSwappyUser.anagrams_of("maana", :tiny_spanish)
+    another_result = AdvancedSwappyUser.anagrams_of("maana", %{wordlist: :tiny_spanish})
     assert another_result != result
     assert another_result == []
   end
@@ -89,6 +89,12 @@ defmodule SwappyTest do
       [ found: ags(["on" , "boat"]), bag: ag("to"), possible_words: ags(["on", "to"])],
       [ found: ags(["not" , "boat"]), bag: ag("o"), possible_words: ags(["not", "on", "to"])],
     ]
+  end
+
+  @tag skip: "switching to keyword list of args"
+  test "can stop after N results" do
+    results = BasicSwappyUser.anagrams_of("this is a really long phrase with lots of results", :default, limit: 1)
+    assert length(results) == 1
   end
 
 end
