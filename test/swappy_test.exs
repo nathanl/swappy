@@ -91,9 +91,10 @@ defmodule SwappyTest do
     ]
   end
 
-  @tag skip: "switching to keyword list of args"
-  test "can stop after N results" do
-    results = BasicSwappyUser.anagrams_of("this is a really long phrase with lots of results", :default, limit: 1)
+  test "can stop early if given a limit" do
+    phrase = "a longish phrase here, no matter what"
+    # TODO do not specify the wordlist here
+    results = BasicSwappyUser.anagrams_of(phrase, %{wordlist: :default, limit: 1})
     assert length(results) == 1
   end
 

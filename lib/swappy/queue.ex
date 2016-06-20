@@ -3,8 +3,9 @@ defmodule Swappy.Queue do
   #  - go until enough, then drop everything else on the floor
   #  - go until enough, wait for remaining workers, return answers and partials so we can continue later
 
-  def process(job) do
-    Swappy.Queue.Manager.start(self, job)
+  def process(job, options) do
+    limit = Map.get(options, :limit, :infinity)
+    Swappy.Queue.Manager.start(self, job, %{limit: limit})
     receive do
       {:results, raw_anagrams} -> raw_anagrams
     end
@@ -15,9 +16,11 @@ defmodule Swappy.Queue do
    # I'm not sure why.
     @worker_count Application.get_env(:swappy, :worker_count)
 
-    def start(spawner_pid, first_job) do
+    def start(spawner_pid, first_job, %{limit: limit}) do
       spawn_link fn ->
-        manage_queue(spawner_pid, [], [first_job], spawn_workers)
+        manage_queue(
+          spawner_pid, [], [first_job], spawn_workers, result_count = 0, limit
+        )
       end
     end
 
@@ -25,22 +28,28 @@ defmodule Swappy.Queue do
       1..@worker_count |> Enum.map(fn _ -> spawn_link &(Swappy.Queue.Worker.work/0) end)
     end
 
-    # all done, yaaaay!
-    defp manage_queue(spawner_pid, results, []=_jobs, idle_workers) when length(idle_workers) == @worker_count do
+    # done because reached limit, yay!
+    defp manage_queue(spawner_pid, results, job, idle_workers, result_count, limit) when result_count >= limit do
+      send(spawner_pid, {:results, results})
+    end
+
+    # done because nothing left to do, yay!
+    defp manage_queue(spawner_pid, results, []=_jobs, idle_workers, result_count, limit) when length(idle_workers) == @worker_count do
       send(spawner_pid, {:results, results})
     end
 
     # can assign work
-    defp manage_queue(spawner_pid, results, [job|jobs_t], [idle_worker|idle_workers_t]) do
-      send(idle_worker, {:job, self, job})
-      manage_queue(spawner_pid, results, jobs_t, idle_workers_t)
+    defp manage_queue(spawner_pid, results, [job|jobs_t], [idle_worker|idle_workers_t], result_count, limit) do
+      send(idle_worker, {:job, self, job, result_count, limit})
+      manage_queue(spawner_pid, results, jobs_t, idle_workers_t, result_count, limit)
     end
 
     # can't assign work
-    defp manage_queue(spawner_pid, results, jobs, idle_workers) do
+    defp manage_queue(spawner_pid, results, jobs, idle_workers, result_count, limit) do
       receive do
         {:worker_results, new_anagrams, new_jobs, worker_pid} ->
-          manage_queue(spawner_pid, results ++ new_anagrams, new_jobs ++ jobs, [worker_pid|idle_workers])
+          new_result_count = length(new_anagrams) + result_count
+          manage_queue(spawner_pid, results ++ new_anagrams, new_jobs ++ jobs, [worker_pid|idle_workers], new_result_count, limit)
       end
     end
   end
@@ -48,8 +57,8 @@ defmodule Swappy.Queue do
   defmodule Worker do
     def work() do
       receive do
-        {:job, queue_pid, job} ->
-          {anagrams, jobs} = do_work([job], [], 0)
+        {:job, queue_pid, job, result_count, limit} ->
+          {anagrams, jobs} = do_work([job], [], 0, result_count, limit)
           send(queue_pid, {:worker_results, anagrams, jobs, self})
       end
       work()
@@ -57,18 +66,21 @@ defmodule Swappy.Queue do
 
     # here be dragons
     @max_batch_size 100_000
-    defp do_work([], found_anagrams, _completed_jobs) do
+    defp do_work([], found_anagrams, _completed_jobs, result_count, limit) do
       {found_anagrams, []}
     end
-    defp do_work(jobs, found_anagrams, @max_batch_size=_completed_jobs) do
+    defp do_work(jobs, found_anagrams, @max_batch_size=_completed_jobs, result_count, limit) do
       {found_anagrams, jobs}
     end
-    defp do_work([job|jobs_t], found_anagrams, completed_jobs) do
+    defp do_work(jobs, found_anagrams, _completed_job, result_count, limit) when result_count == limit do
+      {found_anagrams, jobs}
+    end
+    defp do_work([job|jobs_t], found_anagrams, completed_jobs, result_count, limit) do
       case Swappy.process_one_job(job) do
         {:anagram, anagram} ->
-          do_work(jobs_t, [anagram|found_anagrams], completed_jobs+1)
+          do_work(jobs_t, [anagram|found_anagrams], completed_jobs+1, result_count + 1, limit)
         {:more_jobs, jobs} ->
-          do_work(jobs ++ jobs_t, found_anagrams, completed_jobs+1)
+          do_work(jobs ++ jobs_t, found_anagrams, completed_jobs+1, result_count, limit)
       end
     end
   end

@@ -20,7 +20,11 @@ defmodule Swappy do
       def anagrams_of(phrase, %{wordlist: wordlist_name}=options) when is_atom(wordlist_name) do
         case Map.fetch(dictionaries, wordlist_name) do
           {:ok, dictionary} ->
-            anagrams_of(phrase, %{dictionary: dictionary})
+            new_options =
+              options
+              |> Map.delete(:wordlist)
+              |> Map.put(:dictionary, dictionary)
+            anagrams_of(phrase, new_options)
           :error ->
             raise "Cannot find wordlist named #{inspect wordlist_name} - known wordlists are #{Map.keys(dictionaries)}"
         end
@@ -37,12 +41,17 @@ defmodule Swappy do
       end
 
       def anagrams_of(phrase, %{dictionary: dict}=options) do
-        remaining_options = Map.delete(options, :dictionary)
+        options = Map.delete(options, :dictionary)
         possible_words  = Map.keys(dict) |> Enum.sort # for deterministic test output
         initial_bag = Swappy.Alphagram.to_alphagram(phrase, @legal_chars)
-        # anagrams = Swappy.generate_anagrams(initial_bag, possible_words)
-        anagrams = Swappy.Queue.process([found: [], bag: initial_bag, possible_words: possible_words])
-        anagrams |> Enum.map(&Swappy.human_readable(&1, dict)) |> List.flatten
+        # raw_anagrams = Swappy.generate_anagrams(initial_bag, possible_words)
+        raw_anagrams = Swappy.Queue.process([found: [], bag: initial_bag, possible_words: possible_words], options)
+        anagrams = raw_anagrams |> Enum.map(&Swappy.human_readable(&1, dict)) |> List.flatten
+        if is_integer(Map.get(options, :limit)) do
+          Enum.take(anagrams, Map.get(options, :limit))
+        else
+          anagrams
+        end
       end
     end
 
