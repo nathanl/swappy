@@ -17,10 +17,10 @@ defmodule Swappy do
         anagrams_of(phrase, :default)
       end
 
-      def anagrams_of(phrase, dictionary_name) when is_atom(dictionary_name) do
-        case Map.fetch(dictionaries, dictionary_name) do
+      def anagrams_of(phrase, wordlist_name) when is_atom(wordlist_name) do
+        case Map.fetch(dictionaries, wordlist_name) do
           :error ->
-            raise "Cannot find dictionary named #{inspect dictionary_name} in map returned from `dictionaries`"
+            raise "Cannot find wordlist named #{inspect wordlist_name} - known wordlists are #{Map.keys(dictionaries)}"
           {:ok, dictionary} ->
             anagrams_of(phrase, dictionary)
         end
