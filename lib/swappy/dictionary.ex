@@ -1,24 +1,32 @@
 defmodule Swappy.Dictionary do
 
-  defstruct alphagram_map: %{}, prioritized_wordlist: []
+  defstruct alphagram_map: %{}, ordered_alphagrams: []
 
   def to_dictionary(wordlist) do
     to_dictionary(wordlist, Swappy.Alphagram.default_legal_chars)
   end
 
-  # returns map with entries like ["d", "g", "o"] => ["god", "dog"]
+  # Builds a struct with two properties:
+  # alphagram_map: map with entries like ['dgo'] => ["god", "dog"]
+  # ordered_alphagrams: list of alphagrams in order they were first found in wordlist
   def to_dictionary(wordlist, legal_chars) do
-    {alphagram_map, alphagram_list} = Enum.reduce(wordlist, {%{}, []}, fn word, {map_acc, wordlist_acc} ->
+    {alphagram_map, alphagram_list} = Enum.reduce(wordlist, {%{}, []}, fn word, {ag_map, ordered_ags} ->
       word = String.strip(word)
       if word == "" do
-        map_acc
+        {ag_map, ordered_ags}
       else
-        # If key isn't found, the value passed to our function is 'nil'
-        new_map = update_in(map_acc, [Swappy.Alphagram.to_alphagram(word, legal_chars)], &([word|(&1 || [])]))
-        {new_map, []}
+        alphagram = Swappy.Alphagram.to_alphagram(word, legal_chars)
+        {updated_map, updated_list} = if Map.has_key?(ag_map, alphagram) do
+          existing_words_for_alphagram = Map.get(ag_map, alphagram)
+          updated_map = Map.put(ag_map, alphagram, [word|existing_words_for_alphagram])
+          {updated_map, ordered_ags}
+        else
+          updated_list = [alphagram|ordered_ags]
+          {Map.put(ag_map, alphagram, [word]), updated_list}
+        end
       end
     end)
-    %__MODULE__{alphagram_map: alphagram_map}
+    %__MODULE__{alphagram_map: alphagram_map, ordered_alphagrams: (:lists.reverse(alphagram_list))}
   end
 
   # Takes a filename, returns list with one string per non-empty line

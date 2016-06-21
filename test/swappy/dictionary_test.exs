@@ -8,7 +8,8 @@ defmodule Swappy.DictionaryTest do
       alphagram_map: %{
         'abt' => ["tab", "bat"],
         'aht' => ["hat"],
-      }
+      },
+      ordered_alphagrams: ['abt', 'aht']
     }
     assert actual == expected
   end
