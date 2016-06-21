@@ -4,17 +4,27 @@ defmodule Mix.Tasks.GenerateAnagrams do
 
   @shortdoc "Simple task to generate anagrams for a phrase"
   @moduledoc """
-  Uses the default dictionary. Usage:
-    mix generate_anagrams "hoverboard fever"
+  Generates anagrams using the default dictionary and outputs to STDOUT. Usage:
+
+  ## Simple
+
+      mix generate_anagrams "hoverboard fever"
+
+  ## With Limit
 
   If you give a second argument, it will be taken as a limit for the number of anagrams to generate. Eg:
-    mix generate_anagrams "hoverboard fever" 10
 
-  If the limit isn't a valid number, it will be treated as "infinity". Eg:
-    mix generate_anagrams "hoverboard fever" infinity
+      mix generate_anagrams "hoverboard fever" 10
+
+  If the limit can't be interpreted as an integer, it will be ignored. Eg:
+
+      mix generate_anagrams "hoverboard fever" infinity
+  
+  ## With Required Words
 
   If you give a third argument, it will be treated as words the anagram must include. Eg:
-    mix generate_anagrams "hoverboard fever" 10 "rob drove"
+  
+      mix generate_anagrams "hoverboard fever" infinity "rob drove"
 
   This can be used to work toward something funny - if you see a word or words
   you like, start requiring them, run again, and repeat.
@@ -22,11 +32,11 @@ defmodule Mix.Tasks.GenerateAnagrams do
 
   # TODO - detect closed pipe and stop gracefully? Eg if piping to head
   def run([phrase]) do
-    anagrams_of(phrase) |> Enum.each(&(IO.puts(&1)))
+    anagrams_of(phrase) |> Enum.each(&(puts_unless_pipe_closed(&1)))
   end
 
   def run([phrase, limit]) do
-    anagrams_of(phrase, %{limit: parse_int(limit)}) |> Enum.each(&(IO.puts(&1)))
+    anagrams_of(phrase, %{limit: parse_int(limit)}) |> Enum.each(&(puts_unless_pipe_closed(&1)))
   end
 
   def run([phrase, limit, without]) do
@@ -35,8 +45,17 @@ defmodule Mix.Tasks.GenerateAnagrams do
       {:ok, remaining_alphagram, _without} ->
         remaining_phrase = Swappy.Alphagram.to_string(remaining_alphagram)
         anagrams_of(remaining_phrase, %{limit: parse_int(limit)}) |> Enum.each(fn (anagram_without) ->
-          IO.puts [without, " ", anagram_without]
+          puts_unless_pipe_closed [without, " ", anagram_without]
         end)
+    end
+  end
+
+  # For example, if user is piping STDOUT to `head -10`
+  defp puts_unless_pipe_closed(data) do
+    try do
+      IO.puts(data)
+    rescue
+      ErlangError -> exit(:shutdown)
     end
   end
 
