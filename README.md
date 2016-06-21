@@ -1,6 +1,10 @@
 # Swappy
 
-Elixir anagram generator.
+Elixir-based anagram generator.
+
+## Trying It Out
+
+Assuming you have Elixir installed, you can clone this repo, `mix deps.get` and `mix help generate_anagrams`.
 
 ## Installation
 
@@ -22,7 +26,7 @@ def application do
 end
 ```
 
-## Basic Usage
+## Basic Module Usage
 
 ```elixir
 defmodule MyAnagramGenerator do
