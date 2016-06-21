@@ -43,11 +43,11 @@ defmodule Swappy do
 
       def anagrams_of(phrase, %{dictionary: dict}=options) do
         options = Map.delete(options, :dictionary)
-        possible_words  = Map.keys(dict) |> Enum.sort # for deterministic test output
+        possible_words  = Map.keys(dict.alphagram_map) |> Enum.sort # for deterministic test output
         initial_bag = Swappy.Alphagram.to_alphagram(phrase, @legal_chars)
         # raw_anagrams = Swappy.generate_anagrams(initial_bag, possible_words)
         raw_anagrams = Swappy.Queue.process([found: [], bag: initial_bag, possible_words: possible_words], options)
-        anagrams = raw_anagrams |> Enum.map(&Swappy.human_readable(&1, dict)) |> List.flatten
+        anagrams = raw_anagrams |> Enum.map(&Swappy.human_readable(&1, dict.alphagram_map)) |> List.flatten
         if is_integer(Map.get(options, :limit)) do
           Enum.take(anagrams, Map.get(options, :limit))
         else

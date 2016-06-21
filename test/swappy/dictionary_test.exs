@@ -4,9 +4,11 @@ defmodule Swappy.DictionaryTest do
 
   test "can map dictionary words by character list" do
     actual = Swappy.Dictionary.to_dictionary(["bat", "tab", "hat"])
-    expected = %{
-      'abt' => ["tab", "bat"],
-      'aht' => ["hat"],
+    expected = %Swappy.Dictionary{
+      alphagram_map: %{
+        'abt' => ["tab", "bat"],
+        'aht' => ["hat"],
+      }
     }
     assert actual == expected
   end

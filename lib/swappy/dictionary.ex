@@ -1,12 +1,14 @@
 defmodule Swappy.Dictionary do
 
+  defstruct alphagram_map: %{}, prioritized_wordlist: []
+
   def to_dictionary(wordlist) do
     to_dictionary(wordlist, Swappy.Alphagram.default_legal_chars)
   end
 
   # returns map with entries like ["d", "g", "o"] => ["god", "dog"]
   def to_dictionary(wordlist, legal_chars) do
-    Enum.reduce(wordlist, %{}, fn word, map_acc ->
+    alphagram_map = Enum.reduce(wordlist, %{}, fn word, map_acc ->
       word = String.strip(word)
       if word == "" do
         map_acc
@@ -15,6 +17,7 @@ defmodule Swappy.Dictionary do
         update_in(map_acc, [Swappy.Alphagram.to_alphagram(word, legal_chars)], &([word|(&1 || [])]))
       end
     end)
+    %__MODULE__{alphagram_map: alphagram_map}
   end
 
   # Takes a filename, returns list with one string per non-empty line
