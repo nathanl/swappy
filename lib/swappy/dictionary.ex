@@ -8,13 +8,14 @@ defmodule Swappy.Dictionary do
 
   # returns map with entries like ["d", "g", "o"] => ["god", "dog"]
   def to_dictionary(wordlist, legal_chars) do
-    alphagram_map = Enum.reduce(wordlist, %{}, fn word, map_acc ->
+    {alphagram_map, alphagram_list} = Enum.reduce(wordlist, {%{}, []}, fn word, {map_acc, wordlist_acc} ->
       word = String.strip(word)
       if word == "" do
         map_acc
       else
         # If key isn't found, the value passed to our function is 'nil'
-        update_in(map_acc, [Swappy.Alphagram.to_alphagram(word, legal_chars)], &([word|(&1 || [])]))
+        new_map = update_in(map_acc, [Swappy.Alphagram.to_alphagram(word, legal_chars)], &([word|(&1 || [])]))
+        {new_map, []}
       end
     end)
     %__MODULE__{alphagram_map: alphagram_map}
