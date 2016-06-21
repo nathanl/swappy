@@ -52,6 +52,7 @@ defmodule Swappy.Mixfile do
   defp deps do
     [
       {:ex_doc, "~> 0.10", only: :dev},
+      {:priority_queue, "~> 1.0"},
     ]
   end
 end

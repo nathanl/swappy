@@ -1,11 +1,25 @@
 - Mo documentation
 - Doctests?
 - Implement "stop after finding N anagrams"
-- Implement "and also, the anagrams you produce should be ordered like the dictionary I gave you." Eg, if "fart" is the first word in the dictionary, find all anagrams with "fart" before moving on. This will give users lots of ability to make the sort of anagrams they find funny or interesting. The simplest user strategy would be to just sort their wordlist with biggest words up front, to make "most impressive" anagrams.
-  - To implement:
-    - First, build a dictionary struct. One property will be the current alphagram -> wordlist map, but a new one will be an ordered list of alphagrams. If we have a wordlist of "bat", "hat", "tab", 'abt' should be item 0, 'aht', 1, and when we see "tab", we ignore because we already found 'abt'. We'll then use that list to start off with instead of Map.keys(dictionary).
-    - With that in place, we can assign a priority to each job. The first job created will be priority {0}. When it's expanded, we'll go through the remaining words in order and create {0,0}, {0,1}, etc. When those jobs are expanded, {0,0,0}, {0,0,1}, etc. Anytime a job is created, it goes in a priority queue. When it's time to assign jobs, we pull the lowest number - {0,0} beats {0,0,0} and {0,0,0} beats {0,0,1}. Therefore, if the user's first word in their wordlist is "fart" because they love that, and second is "economics", we'll spell "fart fart fart", if possible, before anything else. Once we go right in the tree and drop the word "fart", we may have already spelled "fart economics", but we certainly won't have spelled anything with "economics" that doesn't include "fart".
-    - If the same word stands up to multiple levels of screening - eg, "apple" is in there twice - it may not have the same priority at each level. But that doesn't matter, because it will still be positioned correctly relative to the other remaining words.
-    - As now, if the user wants 10 anagrams, we still have to build 10 raw anagrams and expand them to ensure we get at least 10, then expand and discard the excess.
 - PROPERTY TESTS!?!?!
 - crazy idea: sigil for alphagrams, which ensures sorted charlist
+
+## Use a Max Priority Queue to store and assign jobs
+
+Each job would get a priority as follows: the first job is `{0}`. Its children are `{0,0}, {0,-1}, {0,-2}...`. Children of `{0,-1}` are `{0,-1,0}, {0,-1,-1}...`.
+
+Because Elixir compares tuples first by length (longer is greater), then by value (a tuple starting with `2` is greater than one starting with `1`), this scheme should mean that we prioritize deeper searches over shallower ones, always pursuing complete anagrams over ones that still need lots of processing. (Although, hmmm, if it's possible to get something in two recursions on one branch, we'd want to do that before pursuing something that requires 10 recursions...)
+
+Doing this allows several advantages.
+  - Building the "most interesting" anagrams first, as defined by the user-ordered input dictionary. Eg, maybe user wants political anagrams, or poo-based ones, or ones with the longest words.
+  - Depth-first exploration means we find complete anagrams before expanding our searches on incomplete ones. That shortens the time to useful results, especially helpful if we're stopping when we finish N anagrams.
+
+## Priorities
+
+{0} vs {0,0} is impossible because {0} produces {0,0}
+{0,0} vs {0,0,1} is impossible for the same reason
+{0,0} vs {0,1} - {0,0} wins by priority
+{0,0} vs {1,0} - {0,0} wins by priority
+{0,0} vs {1,0,0} - {0,0} wins by priority
+
+So all we have to do is compare on each number, and the first time one is lower, it wins.
