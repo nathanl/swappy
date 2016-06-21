@@ -16,17 +16,17 @@ defmodule SwappyTest do
 
   test "can find human-readable anagrams of a phrase using a dictionary" do
     result = BasicSwappyUser.anagrams_of("racecar", %{wordlist: ["arc", "are", "car", "care", "race"]})
-    assert result == ["car race", "car care", "arc race", "arc care"]
+    assert result == ["race car", "race arc", "care car", "care arc"]
   end
 
   test "can handle duplicate words in the input phrase" do
     result = BasicSwappyUser.anagrams_of("apple racecar apple", %{wordlist: ["race", "car", "apple", "racecar"]})
-    assert result == ["apple racecar apple", "apple race apple car"]
+    assert result == ["racecar apple apple", "apple race apple car"]
   end
 
   test "can find words with apostrophes, like 'I'm'" do
     result = BasicSwappyUser.anagrams_of("I'm cool", %{wordlist: ["I'm", "cool", "mi"]})
-    assert result == ["mi cool", "I'm cool"]
+    assert result == ["cool mi", "cool I'm"]
   end
 
   test "uses the built-in default dictionary if none is specified" do
@@ -35,16 +35,16 @@ defmodule SwappyTest do
 
   test "can find anagrams using the built-in default dictionary" do
     result = BasicSwappyUser.anagrams_of("onto")
-    assert result == ["to no", "to on", "o ton", "o not", "onto"]
+    assert result == ["onto", "o ton", "o not", "no to", "on to"]
   end
 
   test "can find anagrams using a dictionary defined in the user's module or the default" do
     result = AdvancedSwappyUser.anagrams_of("spear", %{wordlist: :tiny})
     assert result == ["spear", "spare", "reaps", "pears", "parse", "pares"]
     result = AdvancedSwappyUser.anagrams_of("food", %{wordlist: :foody})
-    assert result == ["of do", "doof", "food"]
+    assert result == ["doof", "food", "do of"]
     result = AdvancedSwappyUser.anagrams_of("onto")
-    assert result == ["to no", "to on", "o ton", "o not", "onto"]
+    assert result == ["onto", "o ton", "o not", "no to", "on to"]
   end
 
   test "uses legal_chars as defined in the user's module" do
