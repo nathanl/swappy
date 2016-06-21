@@ -6,7 +6,7 @@ Elixir-based anagram generator.
 
 Assuming you have Elixir installed, you can clone this repo, `mix deps.get` and `mix help generate_anagrams`.
 
-## Installation
+## Installing As a Project Dependency (not yet available)
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
 
