@@ -12,6 +12,7 @@ defmodule MaxPriorityQueueTest do
 
   test "max heap priority queue" do
     q = PriorityQueue.new
+    # I think this line and the following can never be in the queue at the same time because gold is a child of poop, so which way the comparison would go is irrelevant. If we can always compare by Nth value, a min heap may be fine.
     q = PriorityQueue.put(q, {[0,-1,-1], "gold"})
     q = PriorityQueue.put(q, {[0,-1], "cake"})
     q = PriorityQueue.put(q, {[0,-2], "bread"})
