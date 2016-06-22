@@ -52,8 +52,8 @@ defmodule Swappy.Mixfile do
   defp deps do
     [
       {:ex_doc, "~> 0.10", only: :dev},
-      # {:priority_queue, "~> 1.0"},
-      {:priority_queue, git: "https://github.com/nathanl/elixir_priority_queue", tag: "max_hack"}
+      {:priority_queue, "~> 1.0"},
+      # {:priority_queue, git: "https://github.com/nathanl/elixir_priority_queue", tag: "max_hack"}
     ]
   end
 end
