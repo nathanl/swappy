@@ -1,16 +1,16 @@
 # Swappy
 
-Elixir-based anagram generator.
+Fast, customizable, Elixir-based anagram generator.
 
 ## Trying It Out
 
 Assuming you have Elixir installed, you can clone this repo, `mix deps.get` and `mix help generate_anagrams`.
 
-## Installing As a Project Dependency (not yet available)
+## Installing As a Project Dependency
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+Swappy is [available via Hex](https://hex.pm/packages/swappy). The package can be installed as:
 
-  1. Add swappy to your list of dependencies in `mix.exs`:
+  1. Add Swappy to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -18,7 +18,7 @@ def deps do
 end
 ```
 
-  2. Ensure swappy is started before your application:
+  2. Ensure Swappy is started before your application:
 
 ```elixir
 def application do
