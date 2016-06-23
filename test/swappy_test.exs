@@ -6,27 +6,27 @@ defmodule SwappyTest do
 
   test "can find the only possible anagrams using a tiny dictionary" do
     result = BasicSwappyUser.anagrams_of("onto", %{wordlist: ["on", "to"]})
-    assert result == ["to on"]
+    assert result == ["on to"]
   end
 
   test "ignores punctuation, capitalization and spaces" do
     result = BasicSwappyUser.anagrams_of("On, To!", %{wordlist: ["on", "to"]})
-    assert result == ["to on"]
+    assert result == ["on to"]
   end
 
   test "can find human-readable anagrams of a phrase using a dictionary" do
     result = BasicSwappyUser.anagrams_of("racecar", %{wordlist: ["arc", "are", "car", "care", "race"]})
-    assert result == ["race car", "race arc", "care car", "care arc"]
+    assert result == ["car race", "car care", "arc race", "arc care"]
   end
 
   test "can handle duplicate words in the input phrase" do
     result = BasicSwappyUser.anagrams_of("apple racecar apple", %{wordlist: ["race", "car", "apple", "racecar"]})
-    assert result == ["racecar apple apple", "apple race apple car"]
+    assert result == ["apple apple racecar", "race car apple apple"]
   end
 
   test "can find words with apostrophes, like 'I'm'" do
     result = BasicSwappyUser.anagrams_of("I'm cool", %{wordlist: ["I'm", "cool", "mi"]})
-    assert result == ["cool mi", "cool I'm"]
+    assert result == ["mi cool", "I'm cool"]
   end
 
   test "uses the built-in default dictionary if none is specified" do
@@ -35,21 +35,21 @@ defmodule SwappyTest do
 
   test "can find anagrams using the built-in default dictionary" do
     result = BasicSwappyUser.anagrams_of("onto")
-    assert result == ["onto", "o ton", "o not", "no to", "on to"]
+    assert result == ["to no", "to on", "not o", "ton o", "onto"]
   end
 
   test "can find anagrams using a dictionary defined in the user's module or the default" do
     result = AdvancedSwappyUser.anagrams_of("spear", %{wordlist: :tiny})
     assert result == ["spear", "spare", "reaps", "pears", "parse", "pares"]
     result = AdvancedSwappyUser.anagrams_of("food", %{wordlist: :foody})
-    assert result == ["doof", "food", "do of"]
+    assert result == ["doof", "food", "of do"]
     result = AdvancedSwappyUser.anagrams_of("onto")
-    assert result == ["onto", "o ton", "o not", "no to", "on to"]
+    assert result == ["to no", "to on", "not o", "ton o", "onto"]
   end
 
   test "uses legal_chars as defined in the user's module" do
     result = AdvancedSwappyUser.anagrams_of("mañana", %{wordlist: :tiny_spanish})
-    assert result == ["ña mana", "na maña", "mañana"]
+    assert result == ["mana ña", "maña na", "mañana"]
     another_result = AdvancedSwappyUser.anagrams_of("maana", %{wordlist: :tiny_spanish})
     assert another_result != result
     assert another_result == []
@@ -74,9 +74,9 @@ defmodule SwappyTest do
     possible_words   = ags(["hi", "to", "on", "not"])
     found  = ags([])
     assert Swappy.create_jobs(bag, possible_words, found) == [
-      [ found: ags(["to"]), bag: ag("on"),  possible_words: ags(["to"])],
-      [ found: ags(["on" ]), bag: ag("to"), possible_words: ags(["on", "to"])],
-      [ found: ags(["not" ]), bag: ag("o"), possible_words: ags(["not", "on", "to"])],
+      [ found: ags(["to"]), bag: ag("on"),  possible_words: ags(["to", "on", "not"])],
+      [ found: ags(["on" ]), bag: ag("to"), possible_words: ags(["on", "not"])],
+      [ found: ags(["not" ]), bag: ag("o"), possible_words: ags(["not"])],
     ]
   end
 
@@ -85,9 +85,9 @@ defmodule SwappyTest do
     possible_words   = ags(["hi", "to", "on", "not"])
     found  = ags(["boat"])
     assert Swappy.create_jobs(bag, possible_words, found)  == [
-      [ found: ags(["to", "boat"]), bag: ag("on"),  possible_words: ags(["to"])],
-      [ found: ags(["on" , "boat"]), bag: ag("to"), possible_words: ags(["on", "to"])],
-      [ found: ags(["not" , "boat"]), bag: ag("o"), possible_words: ags(["not", "on", "to"])],
+      [ found: ags(["to", "boat"]), bag: ag("on"),  possible_words: ags(["to", "no", "not"])],
+      [ found: ags(["on" , "boat"]), bag: ag("to"), possible_words: ags(["on", "not"])],
+      [ found: ags(["not" , "boat"]), bag: ag("o"), possible_words: ags(["not"])],
     ]
   end
 
