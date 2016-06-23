@@ -1,4 +1,5 @@
 - More documentation
 - Doctests?
+- Make worker count configurable. Tricky because we need to know the config value at compile time.
 - PROPERTY TESTS!?!?!
 - crazy idea: sigil for alphagrams, which ensures sorted charlist

@@ -34,9 +34,6 @@ defmodule Swappy.Mixfile do
   def application do
     [
       applications: [:logger],
-      env: [
-        worker_count: 4,
-      ],
     ]
   end
 

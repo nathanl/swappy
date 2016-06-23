@@ -96,14 +96,6 @@ Some wordlists include things 'r' as a word, on the grounds that you can say "Th
 
 See `mix help clean_up_english_dictionary` for an opinionated filter, then make your own if you wish.
 
-## Configuration
-
-You can control the number of processes that Swappy uses to search for anagrams by setting an variable in your environment config. You can tweak this number and try running `mix performance` to see how it changes.
-
-```elixir
-config :swappy, worker_count: 4
-```
-
 ## Development
 
 Whatever else you do, check `mix performance` to ensure that anagram generation speed does not degrade.

@@ -14,7 +14,8 @@ defmodule Swappy.Queue do
   defmodule Manager do
    # You would think "as many workers as I have cores" would be optimal, but in my testing, it's fewer than that.
    # I'm not sure why.
-    @worker_count Application.get_env(:swappy, :worker_count)
+   # TODO - make configurable
+    @worker_count 4
 
     def start(spawner_pid, first_job, %{limit: limit}) do
       spawn_link fn ->
