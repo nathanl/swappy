@@ -22,7 +22,7 @@ defmodule Swappy.Mixfile do
 
   def package do
     [
-      maintainers: ["Nathan Long"],
+      maintainers: ["Nathan Long - him@nathanmlong.com"],
       licenses: ["MIT"],
       links: %{"Github" => "https://github.com/nathanl/swappy"}
     ]
