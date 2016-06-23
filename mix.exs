@@ -9,7 +9,7 @@ defmodule Swappy.Mixfile do
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     description: "An anagram generator",
+     description: "Fast, customizable anagram generator",
      package: package,
      docs: [
        extras: ["README.md"],
