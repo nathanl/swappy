@@ -49,6 +49,7 @@ defmodule Swappy.Mixfile do
   defp deps do
     [
       {:ex_doc, "~> 0.10", only: :dev},
+      {:earmark, ">= 0.0.0", only: :dev},
     ]
   end
 end
