@@ -8,7 +8,7 @@ defmodule Mix.Tasks.CleanUpEnglishDictionary do
   In any case, anagrams are found by repeatedly subtracting valid words, so the more very short words we have, the more times we must recurse, and the longer it takes us. The difference can be dramatic, so it's definitely worth filtering your dictionary somehow, even if you don't use this exact filter.
   """
   # This is the opinionated part.
-  @valid_short_words ~w[a i o ab ad ah am an as at aw ax ay be by cc cd do dj eh ex go ha he hi ho id ie if in is it iv kb la lo ma mb mc md me mg mr ms my no of oh ok on or ow ox pa pc pi rd re so st tm to tv uh um up us vc vs we ye yo]
+  @valid_short_words ~w[a i o ab ad ah am an as at aw ax be by do eh ex go ha hi ho ie if in is it ma me mr ms my no of oh ok on or ow ox pa pi so to tv uh um up us vs we ye yo]
 
   def run([input_file_path, output_file_path]) do
       output = input_file_path 
