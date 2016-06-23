@@ -33,12 +33,16 @@ defmodule MyAnagramGenerator do
   use Swappy
 end
 
-anagrams = MyAnagramGenerator.anagrams_of(some_string) # uses a default wordlist
+anagrams = MyAnagramGenerator.anagrams_of("batman") # uses a default wordlist
 # or
-anagrams = MyAnagramGenerator.anagrams_of(some_string, some_wordlist)
+anagrams = MyAnagramGenerator.anagrams_of("batman", %{wordlist: ["bat", "tab", "man", "cat"]})
 ```
 
-`some_wordlist` should be a list of words you consider valid. This is fine for playing around in the console, but since your wordlist requires some processing before Swappy can use it to generate anagrams, you'll get better performance if you let Swappy do that at compilation time.
+The `wordlist` is a list of words you consider valid. This is fine for playing around in the console, but since your wordlist requires some processing before Swappy can use it to generate anagrams, you'll get better performance if you let Swappy do that at compilation time.
+
+You can limit the number of results generated like:
+
+    anagrams = MyAnagramGenerator.anagrams_of(some_string, %{limit: 10})
 
 ## Compiling Custom Wordlists
 
@@ -60,7 +64,7 @@ defmodule SwappyUser do
 end
 ```
 
-You can pass the name of the wordlist to use when generating anagrams: `SwappyUser.anagrams_of("pares", :tiny)`. If no wordlist name is given, `:default` is assumed. If your map includes a `:default`, it will take the place of the one included with Swappy.
+You can pass the name of the wordlist to use when generating anagrams: `SwappyUser.anagrams_of("pares", %{wordlist: :tiny})`. If no wordlist name is given, `:default` is assumed. If your map includes a `:default`, it will take the place of the one included with Swappy.
 
 ## Legal Characters
 
@@ -90,7 +94,7 @@ However, you probably want to clean up whatever you use. In particular, **every 
 
 Some wordlists include things 'r' as a word, on the grounds that you can say "The word 'rake' starts with 'r'." However, having every individual letter considered a "word" makes the number of possible anagrams astronomical.
 
-See `Mix.Tasks.CleanUpEnglishDictionary` for an opinionated filter, then make your own if you wish.
+See `mix help clean_up_english_dictionary` for an opinionated filter, then make your own if you wish.
 
 ## Configuration
 
