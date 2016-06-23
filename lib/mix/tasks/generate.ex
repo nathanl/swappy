@@ -6,6 +6,8 @@ defmodule Mix.Tasks.GenerateAnagrams do
   @moduledoc """
   Generates anagrams using the default dictionary and outputs to STDOUT. Usage:
 
+      mix generate_anagrams input_phrase [limit] [required_words]
+
   ## Simple
 
       mix generate_anagrams "hoverboard fever"
@@ -30,9 +32,9 @@ defmodule Mix.Tasks.GenerateAnagrams do
   you like, start requiring them, run again, and repeat.
   """
 
-  # TODO - detect closed pipe and stop gracefully? Eg if piping to head
   def run([phrase]) do
-    anagrams_of(phrase) |> Enum.each(&(puts_unless_pipe_closed(&1)))
+    print_warning "No limit given - using #{default_limit}. Use 'infinity' to find all anagrams"
+    anagrams_of(phrase, %{limit: default_limit}) |> Enum.each(&(puts_unless_pipe_closed(&1)))
   end
 
   def run([phrase, limit]) do
@@ -61,10 +63,18 @@ defmodule Mix.Tasks.GenerateAnagrams do
 
   defp parse_int(limit) when is_binary(limit) do
     case Integer.parse(limit) do
-      :error -> :infinity
+      :error ->
+        print_warning "'#{limit}' is not a valid limit; ignoring"
+        :infinity
       {val, _} -> val
     end
   end
 
   defp parse_int(_limit), do: :infinity
+
+  defp default_limit, do: 100
+
+  defp print_warning(message) do
+    IO.puts :stderr, "WARNING: #{message}"
+  end
 end
