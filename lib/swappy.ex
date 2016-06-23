@@ -43,11 +43,11 @@ defmodule Swappy do
 
       def anagrams_of(phrase, %{dictionary: dict}=options) do
         options = Map.delete(options, :dictionary)
-        possible_words  = Map.keys(dict) |> Enum.sort # for deterministic test output
+        possible_words  = dict.ordered_alphagrams
         initial_bag = Swappy.Alphagram.to_alphagram(phrase, @legal_chars)
         # raw_anagrams = Swappy.generate_anagrams(initial_bag, possible_words)
         raw_anagrams = Swappy.Queue.process([found: [], bag: initial_bag, possible_words: possible_words], options)
-        anagrams = raw_anagrams |> Enum.map(&Swappy.human_readable(&1, dict)) |> List.flatten
+        anagrams = raw_anagrams |> Enum.map(&Swappy.human_readable(&1, dict.alphagram_map)) |> List.flatten
         if is_integer(Map.get(options, :limit)) do
           Enum.take(anagrams, Map.get(options, :limit))
         else
@@ -103,7 +103,10 @@ defmodule Swappy do
     jobs(words, bags, found, [])
   end
 
-  def jobs([]=_words, []=_bags, _found, acc), do: acc
+  def jobs([]=_words, []=_bags, _found, acc) do
+    # jobs should be ordered like the wordlist for priority's sake
+    :lists.reverse(acc)
+  end
   def jobs([word|words_t]=words, [bag|bags_t], found, acc) do
     one_job = [ found: [word|found], bag: bag, possible_words: words ]
     jobs(words_t, bags_t, found, [one_job|acc])
@@ -114,13 +117,17 @@ defmodule Swappy do
   # - if it can be, add it to the words we've found, and add a bag that is the
   # old bag minus this word's letters
   def find_words(bag, possible_words) do
-    possible_words
+    filtered_words_and_bags = possible_words
     |> Enum.reduce({[], []}, fn (possible_word, {words, bags}) ->
       case Swappy.Alphagram.without(bag, possible_word) do
         {:ok, remaining_bag, word} -> { [word|words], [remaining_bag|bags] }
         _ -> {words, bags}
       end
     end)
+    # Restore original order from wordlist
+    words = :lists.reverse(elem(filtered_words_and_bags, 0))
+    bags  = :lists.reverse(elem(filtered_words_and_bags, 1))
+    {words, bags}
   end
 
   # Convert a list of alphagrams to a list of human-readable anagrams

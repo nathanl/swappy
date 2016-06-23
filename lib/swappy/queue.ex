@@ -80,6 +80,9 @@ defmodule Swappy.Queue do
         {:anagram, anagram} ->
           do_work(jobs_t, [anagram|found_anagrams], completed_jobs+1, result_count + 1, limit)
         {:more_jobs, jobs} ->
+          # The fact that new jobs are added to the front, and that the new ones should be
+          # sorted like the incoming wordlist, should mean that the next job to work is
+          # always the one with the highest-priority available word
           do_work(jobs ++ jobs_t, found_anagrams, completed_jobs+1, result_count, limit)
       end
     end
