@@ -1,6 +1,7 @@
 defmodule Mix.Tasks.GenerateAnagrams do
   use Mix.Task
   use Swappy
+  @default_limit 100
 
   @shortdoc "Simple task to generate anagrams for a phrase"
   @moduledoc """
@@ -18,23 +19,25 @@ defmodule Mix.Tasks.GenerateAnagrams do
 
       mix generate_anagrams "hoverboard fever" 10
 
-  If the limit can't be interpreted as an integer, it will be ignored. Eg:
+  The default limit for this task is #{@default_limit}. To generate all anagrams, give "all" as your limit.
 
-      mix generate_anagrams "hoverboard fever" infinity
+      mix generate_anagrams "hoverboard fever" all
+
+  Any other limit that can't be interpreted as an integer will be ignored.
   
   ## With Required Words
 
   If you give a third argument, it will be treated as words the anagram must include. Eg:
   
-      mix generate_anagrams "hoverboard fever" infinity "rob drove"
+      mix generate_anagrams "hoverboard fever" all "rob drove"
 
   This can be used to work toward something funny - if you see a word or words
   you like, start requiring them, run again, and repeat.
   """
 
   def run([phrase]) do
-    print_warning "No limit given - using #{default_limit}. Use 'infinity' to find all anagrams"
-    anagrams_of(phrase, %{limit: default_limit}) |> Enum.each(&(puts_unless_pipe_closed(&1)))
+    print_warning "No limit given - using #{@default_limit}. Use 'all' to find all anagrams"
+    anagrams_of(phrase, %{limit: @default_limit}) |> Enum.each(&(puts_unless_pipe_closed(&1)))
   end
 
   def run([phrase, limit]) do
@@ -64,15 +67,17 @@ defmodule Mix.Tasks.GenerateAnagrams do
   defp parse_int(limit) when is_binary(limit) do
     case Integer.parse(limit) do
       :error ->
-        print_warning "'#{limit}' is not a valid limit; ignoring"
-        :infinity
+        if limit == "all" do
+          :infinity
+        else
+          print_warning "'#{limit}' is not a valid limit; please specify either an integer or 'all'. Using default limit of #{@default_limit}."
+          @default_limit
+        end
       {val, _} -> val
     end
   end
 
   defp parse_int(_limit), do: :infinity
-
-  defp default_limit, do: 100
 
   defp print_warning(message) do
     IO.puts :stderr, "WARNING: #{message}"
