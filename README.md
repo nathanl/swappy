@@ -42,7 +42,9 @@ The `wordlist` is a list of words you consider valid. This is fine for playing a
 
 You can limit the number of results generated like:
 
-    anagrams = MyAnagramGenerator.anagrams_of(some_string, %{limit: 10})
+```elixir
+anagrams = MyAnagramGenerator.anagrams_of(some_string, %{limit: 10})
+```
 
 ## Compiling Custom Wordlists
 
