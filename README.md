@@ -66,6 +66,8 @@ end
 
 You can pass the name of the wordlist to use when generating anagrams: `SwappyUser.anagrams_of("pares", %{wordlist: :tiny})`. If no wordlist name is given, `:default` is assumed. If your map includes a `:default`, it will take the place of the one included with Swappy.
 
+If you use a `limit`, the words at the start of your wordlist will be more likely to show up than the words at the end (though this isn't perfect yet).
+
 ## Legal Characters
 
 You can also customize which characters Swappy considers "legal" for the purposes of comparison. "Illegal" characters are not considered when deciding how things can be rearranged, but can still show up in your anagrams.
