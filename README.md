@@ -8,9 +8,9 @@ Assuming you have Elixir installed, you can clone this repo, `mix deps.get` and 
 
 ## Installing As a Project Dependency
 
-Swappy is [available via Hex](https://hex.pm/packages/swappy). The package can be installed as:
+Swappy is [available via Hex](https://hex.pm/packages/swappy). To use it in a project:
 
-  1. Add Swappy to your list of dependencies in `mix.exs`:
+Add Swappy to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -18,7 +18,7 @@ def deps do
 end
 ```
 
-  2. Ensure Swappy is started before your application:
+Ensure Swappy is started before your application:
 
 ```elixir
 def application do
