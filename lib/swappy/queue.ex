@@ -20,7 +20,7 @@ defmodule Swappy.Queue do
     def start(spawner_pid, first_job, %{limit: limit}) do
       spawn_link fn ->
         manage_queue(
-          spawner_pid, [], [first_job], spawn_workers, result_count = 0, limit
+          spawner_pid, [], [first_job], spawn_workers, _result_count = 0, limit
         )
       end
     end
@@ -30,12 +30,12 @@ defmodule Swappy.Queue do
     end
 
     # done because reached limit, yay!
-    defp manage_queue(spawner_pid, results, job, idle_workers, result_count, limit) when result_count >= limit do
+    defp manage_queue(spawner_pid, results, _job, _idle_workers, result_count, limit) when result_count >= limit do
       send(spawner_pid, {:results, results})
     end
 
     # done because nothing left to do, yay!
-    defp manage_queue(spawner_pid, results, []=_jobs, idle_workers, result_count, limit) when length(idle_workers) == @worker_count do
+    defp manage_queue(spawner_pid, results, []=_jobs, idle_workers, _result_count, _limit) when length(idle_workers) == @worker_count do
       send(spawner_pid, {:results, results})
     end
 
@@ -67,10 +67,10 @@ defmodule Swappy.Queue do
 
     # here be dragons
     @max_batch_size 100_000
-    defp do_work([], found_anagrams, _completed_jobs, result_count, limit) do
+    defp do_work([], found_anagrams, _completed_jobs, _result_count, _limit) do
       {found_anagrams, []}
     end
-    defp do_work(jobs, found_anagrams, @max_batch_size=_completed_jobs, result_count, limit) do
+    defp do_work(jobs, found_anagrams, @max_batch_size=_completed_jobs, _result_count, _limit) do
       {found_anagrams, jobs}
     end
     defp do_work(jobs, found_anagrams, _completed_job, result_count, limit) when result_count == limit do
