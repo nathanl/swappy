@@ -100,6 +100,15 @@ Some wordlists include things 'r' as a word, on the grounds that you can say "Th
 
 See `mix help clean_up_english_dictionary` for an opinionated filter, then make your own if you wish.
 
+## How This Works
+
+(TODO - flesh out)
+
+- Take the input phrase and the dictionary
+- Go through each word in the dictionary and ask, "can I spell this word using what's in this phrase?" Eg, "hat" can't be spelled using "my cat" because there's no "h". "matt" can't either because there's only one "t".
+- ...
+- Find combinations of alphagrams that we can spell using the phrase. Eg, "hitstab" can be used to build the alphagram combo "hist abt" (like "hits tab") or "hit abst" ( "like "hit stab"). For each of those, we can expand each alphagram - eg, "abst" can spell the dictionary word "bats" or "tabs" or "stab", so "hit abst" can be expanded to "hit bats" and "hit tabs" and "hit stab".
+
 ## Development
 
 Whatever else you do, check `mix performance` to ensure that anagram generation speed does not degrade.
