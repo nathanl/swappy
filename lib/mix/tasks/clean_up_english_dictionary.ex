@@ -14,7 +14,7 @@ defmodule Mix.Tasks.CleanUpEnglishDictionary do
       output = input_file_path 
       |> Path.expand
       |> File.stream!
-      |> Enum.map(&String.strip/1)
+      |> Enum.map(&String.trim/1)
       |> Enum.filter(&valid_word?/1)
 
       # Add line breaks

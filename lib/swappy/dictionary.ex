@@ -11,12 +11,12 @@ defmodule Swappy.Dictionary do
   # ordered_alphagrams: list of alphagrams in order they were first found in wordlist
   def to_dictionary(wordlist, legal_chars) do
     {alphagram_map, alphagram_list} = Enum.reduce(wordlist, {%{}, []}, fn word, {ag_map, ordered_ags} ->
-      word = String.strip(word)
+      word = String.trim(word)
       if word == "" do
         {ag_map, ordered_ags}
       else
         alphagram = Swappy.Alphagram.to_alphagram(word, legal_chars)
-        {updated_map, updated_list} = if Map.has_key?(ag_map, alphagram) do
+        if Map.has_key?(ag_map, alphagram) do
           existing_words_for_alphagram = Map.get(ag_map, alphagram)
           updated_map = Map.put(ag_map, alphagram, [word|existing_words_for_alphagram])
           {updated_map, ordered_ags}
@@ -34,12 +34,12 @@ defmodule Swappy.Dictionary do
     filename
     |> Path.expand
     |> File.stream!
-    |> Enum.map(&String.strip/1)
+    |> Enum.map(&String.trim/1)
   end
 
   # Merges the user's map of wordlists with Swappy defaults and loads files as necessary
   def add_wordlists(user_wordlists) do
-    wordlists = Map.merge(default_wordlists, (user_wordlists || %{}))
+    wordlists = Map.merge(default_wordlists(), (user_wordlists || %{}))
     for {wordlist_name, wordlist} <- wordlists, into: %{} do
       loaded_wordlist = if is_binary(wordlist) do
         load_file(wordlist)

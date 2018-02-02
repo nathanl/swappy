@@ -5,7 +5,7 @@ defmodule Swappy.Queue do
 
   def process(job, options) do
     limit = Map.get(options, :limit, :infinity)
-    Swappy.Queue.Manager.start(self, job, %{limit: limit})
+    Swappy.Queue.Manager.start(self(), job, %{limit: limit})
     receive do
       {:results, raw_anagrams} -> raw_anagrams
     end
@@ -20,7 +20,7 @@ defmodule Swappy.Queue do
     def start(spawner_pid, first_job, %{limit: limit}) do
       spawn_link fn ->
         manage_queue(
-          spawner_pid, [], [first_job], spawn_workers, _result_count = 0, limit
+          spawner_pid, [], [first_job], spawn_workers(), _result_count = 0, limit
         )
       end
     end
@@ -41,7 +41,7 @@ defmodule Swappy.Queue do
 
     # can assign work
     defp manage_queue(spawner_pid, results, [job|jobs_t], [idle_worker|idle_workers_t], result_count, limit) do
-      send(idle_worker, {:job, self, job, result_count, limit})
+      send(idle_worker, {:job, self(), job, result_count, limit})
       manage_queue(spawner_pid, results, jobs_t, idle_workers_t, result_count, limit)
     end
 
@@ -60,7 +60,7 @@ defmodule Swappy.Queue do
       receive do
         {:job, queue_pid, job, result_count, limit} ->
           {anagrams, jobs} = do_work([job], [], 0, result_count, limit)
-          send(queue_pid, {:worker_results, anagrams, jobs, self})
+          send(queue_pid, {:worker_results, anagrams, jobs, self()})
       end
       work()
     end

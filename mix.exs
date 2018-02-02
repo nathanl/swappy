@@ -10,14 +10,14 @@ defmodule Swappy.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      description: "Fast, customizable anagram generator",
-     package: package,
+     package: package(),
      docs: [
        extras: ["README.md"],
        main: "readme",
        source_ref: "v#{@version}",
        source_url: "https://github.com/nathanl/swappy"
      ],
-     deps: deps]
+     deps: deps()]
   end
 
   def package do

@@ -15,7 +15,7 @@ defmodule Swappy.Alphagram do
 
   # Convenience for to_alphagram/2; uses default list
   def to_alphagram(string) do
-    to_alphagram(string, default_legal_chars)
+    to_alphagram(string, default_legal_chars())
   end
 
   # Sorted, non-unique list of chars
@@ -23,7 +23,7 @@ defmodule Swappy.Alphagram do
   def to_alphagram(string, legal_chars) do
     string
     |> String.downcase
-    |> String.to_char_list
+    |> String.to_charlist
     |> Enum.filter(&(&1 in legal_chars))
     |> Enum.sort
   end

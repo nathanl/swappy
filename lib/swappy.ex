@@ -19,7 +19,7 @@ defmodule Swappy do
       end
 
       def anagrams_of(phrase, %{wordlist: wordlist_name}=options) when is_atom(wordlist_name) do
-        case Map.fetch(dictionaries, wordlist_name) do
+        case Map.fetch(dictionaries(), wordlist_name) do
           {:ok, dictionary} ->
             new_options =
               options
@@ -27,7 +27,7 @@ defmodule Swappy do
               |> Map.put(:dictionary, dictionary)
             anagrams_of(phrase, new_options)
           :error ->
-            raise "Cannot find wordlist named #{inspect wordlist_name} - known wordlists are #{Map.keys(dictionaries)}"
+            raise "Cannot find wordlist named #{inspect wordlist_name} - known wordlists are #{Map.keys(dictionaries())}"
         end
       end
 
