@@ -1,4 +1,9 @@
 defmodule Swappy.Alphagram do
+  @moduledoc """
+  Module for working with 'alphagrams' - a sorted, non-unique list of
+  characters, implemented as charlists.
+  """
+
   @default_legal_chars 'abcdefghijklmnopqrstuvwxyz'
   def default_legal_chars do
     @default_legal_chars
