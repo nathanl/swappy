@@ -19,6 +19,7 @@ defmodule Swappy.Alphagram do
 
   # Sorted, non-unique list of chars
   # "alpha" -> 'aahlp'
+  @spec to_alphagram(String.t()) :: charlist()
   def to_alphagram(string, legal_chars) do
     string
     |> String.downcase()
