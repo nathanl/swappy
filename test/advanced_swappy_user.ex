@@ -1,5 +1,4 @@
 defmodule AdvancedSwappyUser do
-
   @legal_chars 'abcdefghijklmnopqrstuvwxyz' ++ 'áéíóúüñ'
   @wordlists %{
     tiny: ["pares", "parse", "pears", "reaps", "spare", "spear"],

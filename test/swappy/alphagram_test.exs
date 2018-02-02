@@ -10,18 +10,18 @@ defmodule Swappy.AlphagramTest do
     # Assumes default legal chars
     assert Swappy.Alphagram.to_alphagram("nappy?!!") == 'anppy'
 
-    legal_chars  = 'bcdefghijklmnopqrstuvwxyz'
+    legal_chars = 'bcdefghijklmnopqrstuvwxyz'
     assert Swappy.Alphagram.to_alphagram("nappy?!!", legal_chars) == 'nppy'
 
     assert Swappy.Alphagram.to_alphagram("nappy?!!", 'ap') == 'app'
   end
 
   test "subtracting nothing from a list" do
-    assert Swappy.Alphagram.without('a', [])         == {:ok, 'a', []}
+    assert Swappy.Alphagram.without('a', []) == {:ok, 'a', []}
   end
 
   test "subtracting everything from a one-item list" do
-    assert Swappy.Alphagram.without('a', 'a')      == {:ok, [], 'a'}
+    assert Swappy.Alphagram.without('a', 'a') == {:ok, [], 'a'}
   end
 
   test "subtracting everything from a multi-item list" do
@@ -29,7 +29,7 @@ defmodule Swappy.AlphagramTest do
   end
 
   test "subtracting the first item from a list" do
-    assert Swappy.Alphagram.without('aa', 'a')      == {:ok, 'a', 'a'}
+    assert Swappy.Alphagram.without('aa', 'a') == {:ok, 'a', 'a'}
   end
 
   test "subtracting some items from different parts of a list" do
@@ -38,8 +38,8 @@ defmodule Swappy.AlphagramTest do
 
   test "trying to subtract an item that's not in the list" do
     assert Swappy.Alphagram.without(
-      'ab', 'x'
-    ) == {:error, "outer does not contain all letters of inner", {'ab', 'x'}}
+             'ab',
+             'x'
+           ) == {:error, "outer does not contain all letters of inner", {'ab', 'x'}}
   end
-
 end

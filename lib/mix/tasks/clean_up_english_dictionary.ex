@@ -11,26 +11,26 @@ defmodule Mix.Tasks.CleanUpEnglishDictionary do
   @valid_short_words ~w[a i o ab ad ah am an as at aw ax be by do eh ex go ha hi ho ie if in is it ma me mr ms my no of oh ok on or ow ox pa pi so to tv uh um up us vs we ye yo]
 
   def run([input_file_path, output_file_path]) do
-      output = input_file_path 
-      |> Path.expand
-      |> File.stream!
+    output =
+      input_file_path
+      |> Path.expand()
+      |> File.stream!()
       |> Enum.map(&String.trim/1)
       |> Enum.filter(&valid_word?/1)
 
-      # Add line breaks
-      output = output |> Enum.map(fn (result) -> [result, "\n"] end)
+    # Add line breaks
+    output = output |> Enum.map(fn result -> [result, "\n"] end)
 
-      output_file_path
-      |> Path.expand
-      |> File.write!(output)
+    output_file_path
+    |> Path.expand()
+    |> File.write!(output)
+  end
+
+  defp valid_word?(word) do
+    cond do
+      String.length(word) > 2 -> true
+      word in @valid_short_words -> true
+      true -> false
     end
-
-    defp valid_word?(word) do
-      cond do
-        String.length(word) > 2    -> true
-        word in @valid_short_words -> true
-        true -> false
-      end
-    end
-
+  end
 end

@@ -15,12 +15,18 @@ defmodule SwappyTest do
   end
 
   test "can find human-readable anagrams of a phrase using a dictionary" do
-    result = BasicSwappyUser.anagrams_of("racecar", %{wordlist: ["arc", "are", "car", "care", "race"]})
+    result =
+      BasicSwappyUser.anagrams_of("racecar", %{wordlist: ["arc", "are", "car", "care", "race"]})
+
     assert result == ["car race", "car care", "arc race", "arc care"]
   end
 
   test "can handle duplicate words in the input phrase" do
-    result = BasicSwappyUser.anagrams_of("apple racecar apple", %{wordlist: ["race", "car", "apple", "racecar"]})
+    result =
+      BasicSwappyUser.anagrams_of("apple racecar apple", %{
+        wordlist: ["race", "car", "apple", "racecar"]
+      })
+
     assert result == ["apple apple racecar", "race car apple apple"]
   end
 
@@ -30,7 +36,8 @@ defmodule SwappyTest do
   end
 
   test "uses the built-in default dictionary if none is specified" do
-    assert BasicSwappyUser.anagrams_of("onto") == BasicSwappyUser.anagrams_of("onto", %{wordlist: :default})
+    assert BasicSwappyUser.anagrams_of("onto") ==
+             BasicSwappyUser.anagrams_of("onto", %{wordlist: :default})
   end
 
   test "can find anagrams using the built-in default dictionary" do
@@ -56,14 +63,19 @@ defmodule SwappyTest do
   end
 
   test "human_readable builds a 'cartesian join' of words the alphagrams can spell" do
-    anagram = [["a","c","e","r"], ["a","c","r"]]
+    anagram = [["a", "c", "e", "r"], ["a", "c", "r"]]
+
     dictionary = %{
       ["a", "c", "e", "r"] => ["race", "care"],
-      ["a", "c", "r"] => ["car"],
+      ["a", "c", "r"] => ["car"]
     }
-    assert((Swappy.human_readable(anagram, dictionary) |> Enum.sort) == [
-      "car care", "car race"
-    ])
+
+    assert(
+      Swappy.human_readable(anagram, dictionary) |> Enum.sort() == [
+        "car care",
+        "car race"
+      ]
+    )
   end
 
   def ag(str), do: Swappy.Alphagram.to_alphagram(str)
@@ -71,24 +83,26 @@ defmodule SwappyTest do
 
   test "create_jobs makes jobs for the next level of the search tree" do
     bag = ag("onto")
-    possible_words   = ags(["hi", "to", "on", "not"])
-    found  = ags([])
+    possible_words = ags(["hi", "to", "on", "not"])
+    found = ags([])
+
     assert Swappy.create_jobs(bag, possible_words, found) == [
-      [ found: ags(["to"]), bag: ag("on"),  possible_words: ags(["to", "on", "not"])],
-      [ found: ags(["on" ]), bag: ag("to"), possible_words: ags(["on", "not"])],
-      [ found: ags(["not" ]), bag: ag("o"), possible_words: ags(["not"])],
-    ]
+             [found: ags(["to"]), bag: ag("on"), possible_words: ags(["to", "on", "not"])],
+             [found: ags(["on"]), bag: ag("to"), possible_words: ags(["on", "not"])],
+             [found: ags(["not"]), bag: ag("o"), possible_words: ags(["not"])]
+           ]
   end
 
   test "create_jobs adds to the list of found words" do
     bag = ag("onto")
-    possible_words   = ags(["hi", "to", "on", "not"])
-    found  = ags(["boat"])
-    assert Swappy.create_jobs(bag, possible_words, found)  == [
-      [ found: ags(["to", "boat"]), bag: ag("on"),  possible_words: ags(["to", "no", "not"])],
-      [ found: ags(["on" , "boat"]), bag: ag("to"), possible_words: ags(["on", "not"])],
-      [ found: ags(["not" , "boat"]), bag: ag("o"), possible_words: ags(["not"])],
-    ]
+    possible_words = ags(["hi", "to", "on", "not"])
+    found = ags(["boat"])
+
+    assert Swappy.create_jobs(bag, possible_words, found) == [
+             [found: ags(["to", "boat"]), bag: ag("on"), possible_words: ags(["to", "no", "not"])],
+             [found: ags(["on", "boat"]), bag: ag("to"), possible_words: ags(["on", "not"])],
+             [found: ags(["not", "boat"]), bag: ag("o"), possible_words: ags(["not"])]
+           ]
   end
 
   test "can stop early if given a limit" do
@@ -99,7 +113,8 @@ defmodule SwappyTest do
 
   test "assumes default dictionary even if other options given" do
     phrase = "onto"
-    assert BasicSwappyUser.anagrams_of(phrase, %{limit: 1}) == BasicSwappyUser.anagrams_of(phrase, %{wordlist: :default, limit: 1})
-  end
 
+    assert BasicSwappyUser.anagrams_of(phrase, %{limit: 1}) ==
+             BasicSwappyUser.anagrams_of(phrase, %{wordlist: :default, limit: 1})
+  end
 end
