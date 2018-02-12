@@ -112,3 +112,4 @@ See `mix help clean_up_english_dictionary` for an opinionated filter, then make 
 ## Development
 
 Whatever else you do, check `mix performance` to ensure that anagram generation speed does not degrade.
+
