@@ -2,6 +2,8 @@
 
 Fast, customizable, Elixir-based anagram generator.
 
+(But https://crates.io/crates/swappy is faster.)
+
 ## Trying It Out
 
 Assuming you have Elixir installed, you can clone this repo, `mix deps.get` and `mix help generate_anagrams`.
